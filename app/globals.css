@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+
+:root {
+  --color-bg: #f8fafc;
+  --color-fg: #0f172a;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f1f5f9;
+  --color-border: #cbd5e1;
+  --color-primary: #059669;
+  --color-primary-fg: #ffffff;
+  --color-muted: #64748b;
+  --color-muted-fg: #334155;
+  --color-accent: #2563eb;
+  --color-accent-fg: #ffffff;
+  --color-danger: #dc2626;
+  --color-danger-fg: #ffffff;
+  --color-warning: #d97706;
+  --color-warning-fg: #ffffff;
+  --color-info: #0284c7;
+  --color-info-fg: #ffffff;
+  --focus-ring: #2563eb;
+}
+
+[data-theme='dark'] {
+  --color-bg: #090d16;
+  --color-fg: #f8fafc;
+  --color-surface: #111827;
+  --color-surface-elevated: #1e293b;
+  --color-border: #334155;
+  --color-primary: #10b981;
+  --color-primary-fg: #090d16;
+  --color-muted: #94a3b8;
+  --color-muted-fg: #cbd5e1;
+  --color-accent: #3b82f6;
+  --color-accent-fg: #ffffff;
+  --color-danger: #ef4444;
+  --color-danger-fg: #ffffff;
+  --color-warning: #f59e0b;
+  --color-warning-fg: #090d16;
+  --color-info: #38bdf8;
+  --color-info-fg: #090d16;
+  --focus-ring: #60a5fa;
+}
+
+[data-theme='high-contrast'] {
+  --color-bg: #000000;
+  --color-fg: #ffffff;
+  --color-surface: #000000;
+  --color-surface-elevated: #121212;
+  --color-border: #ffffff;
+  --color-primary: #00ff66;
+  --color-primary-fg: #000000;
+  --color-muted: #ffff00;
+  --color-muted-fg: #ffffff;
+  --color-accent: #00ffff;
+  --color-accent-fg: #000000;
+  --color-danger: #ff3333;
+  --color-danger-fg: #ffffff;
+  --color-warning: #ffff00;
+  --color-warning-fg: #000000;
+  --color-info: #00ffff;
+  --color-info-fg: #000000;
+  --focus-ring: #ffff00;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Accessible focus ring (WCAG 2.4.11 / 2.4.13: >= 3:1 contrast, unobscured) */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Skip to main content link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 1rem;
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+  padding: 0.75rem 1.25rem;
+  z-index: 9999;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}

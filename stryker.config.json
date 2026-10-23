@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/api/schema/stryker-schema.json",
+  "testRunner": "vitest",
+  "testRunnerNodeArgs": ["--experimental-vm-modules"],
+  "mutate": ["lib/domain/**/*.ts", "!lib/domain/**/*.test.ts"],
+  "reporters": ["progress", "clear-text", "html"],
+  "htmlReporter": {
+    "fileName": "reports/mutation/mutation.html"
+  },
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": null
+  },
+  "timeoutMS": 10000,
+  "concurrency": 2
+}

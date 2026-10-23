@@ -1,0 +1,41 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+/playwright-report
+/test-results
+/.stryker-tmp
+
+# Next.js build output
+/.next/
+/out/
+
+# Production
+/build
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables (allow .env.example)
+.env*.local
+.env.development
+.env.test
+.env.production
+.env
+!.env.example
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# OS files
+.DS_Store
+Thumbs.db

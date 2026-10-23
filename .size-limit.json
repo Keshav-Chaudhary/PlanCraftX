@@ -1,0 +1,14 @@
+[
+  {
+    "name": "React 19 Framework Chunk",
+    "path": ".next/static/chunks/framework-*.js",
+    "limit": "80 kB",
+    "gzip": true
+  },
+  {
+    "name": "Main Client Runtime Chunk",
+    "path": ".next/static/chunks/main-*.js",
+    "limit": "50 kB",
+    "gzip": true
+  }
+]

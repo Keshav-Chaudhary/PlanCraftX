@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/knip@5/overview/schema.json",
+  "entry": [
+    "app/**/{page,layout,loading,error,not-found,route}.{ts,tsx}",
+    "scripts/**/*.{js,mjs,ts}",
+    "tests/**/*.{ts,tsx}"
+  ],
+  "project": ["app/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}", "scripts/**/*.{js,mjs,ts}"],
+  "ignoreDependencies": [
+    "@google/genai",
+    "clsx",
+    "lucide-react",
+    "tailwind-merge",
+    "@axe-core/playwright",
+    "@commitlint/cli",
+    "@testing-library/user-event",
+    "eslint-config-next",
+    "@next/eslint-plugin-next",
+    "fast-check",
+    "lint-staged",
+    "msw"
+  ],
+  "rules": {
+    "types": "off"
+  },
+  "ignoreExportsUsedInFile": true
+}
