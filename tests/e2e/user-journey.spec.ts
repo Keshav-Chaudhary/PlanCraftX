@@ -61,7 +61,7 @@ test.describe('End-to-End Core Planning Journey', () => {
     await submitBtn.click({ force: true });
 
     // 6. Verify Redirection to /plan with Active Plan Overview
-    await expect(page).toHaveURL(/\/plan$/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/plan\/?$/, { timeout: 15000 });
     await expect(page.locator('h1')).toContainText('Planning: Chicago, IL');
     await expect(page.locator('text=Outdoor Venue')).toBeVisible();
     await expect(page.locator('#quick-link-budget')).toBeVisible();

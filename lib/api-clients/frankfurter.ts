@@ -1,5 +1,6 @@
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
+import { secureFetch } from '../security/secure-fetch';
 
 export async function fetchExchangeRate(
   from: string,
@@ -16,7 +17,7 @@ export async function fetchExchangeRate(
   const url = `${env.FRANKFURTER_BASE_URL}/latest?from=${fromUpper}&to=${toUpper}`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const res = await secureFetch(url, { timeoutMs: 8000 });
     if (!res.ok) {
       return err({
         code: 'UPSTREAM_ERROR',

@@ -4,9 +4,8 @@ import { useState, useMemo } from 'react';
 import type { EventPlan, BudgetItem } from '@/lib/schemas/event-plan';
 import {
   minorToMajor,
-  majorToMinor,
-  rebalanceAllocations,
   convertCurrency,
+  updateBudgetItemAllocation,
 } from '@/lib/domain/budget-math';
 
 export function useBudgetActions(plan: EventPlan, onPlanUpdate: (updatedPlan: EventPlan) => void) {
@@ -45,29 +44,8 @@ export function useBudgetActions(plan: EventPlan, onPlanUpdate: (updatedPlan: Ev
       return;
     }
 
-    const newMinor = majorToMinor(newMajor, plan.currency);
-    const updatedItems = plan.budgetItems.map((it) => ({
-      category: it.category,
-      allocatedMinor: it.id === itemId ? newMinor : it.allocatedMinor,
-      isLocked: it.id === itemId,
-    }));
-
-    const rebalanced = rebalanceAllocations(plan.totalBudgetMinor, updatedItems);
-    const rebalancedMap = new Map(rebalanced.map((r) => [r.category, r.allocatedMinor]));
-
-    const newBudgetItems: BudgetItem[] = plan.budgetItems.map((it) => {
-      const updatedAlloc = rebalancedMap.get(it.category);
-      return {
-        ...it,
-        allocatedMinor: updatedAlloc !== undefined ? updatedAlloc : it.allocatedMinor,
-      };
-    });
-
-    onPlanUpdate({
-      ...plan,
-      budgetItems: newBudgetItems,
-      updatedAt: new Date().toISOString(),
-    });
+    const updatedPlan = updateBudgetItemAllocation(plan, itemId, newMajor);
+    onPlanUpdate(updatedPlan);
     cancelEdit();
   };
 

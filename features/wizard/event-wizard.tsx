@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { EventPlan, EventTypeEnum } from '@/lib/schemas/event-plan';
+import { buildEventPlan, type PlanGenerationInput } from '@/lib/domain/plan-generator';
 import { EventTypePicker } from './event-type-picker';
 import { WizardScaleFields } from './wizard-scale-fields';
 import { WizardPreferencesFields } from './wizard-preferences-fields';
@@ -10,6 +11,31 @@ import { WizardAiIntake } from './wizard-ai-intake';
 interface EventWizardProps {
   readonly onPlanCreated: (plan: EventPlan) => void;
   readonly isInitialSetup?: boolean;
+}
+
+async function fetchOrFallbackPlan(payload: PlanGenerationInput): Promise<EventPlan> {
+  let res: Response;
+  try {
+    res = await fetch('/api/plan/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch (err: unknown) {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      return buildEventPlan(payload);
+    }
+    throw err;
+  }
+
+  if (res.ok) {
+    return (await res.json()) as EventPlan;
+  }
+  if (res.status === 404) {
+    return buildEventPlan(payload);
+  }
+  const errData = (await res.json().catch(() => ({}))) as { message?: string };
+  throw new Error(errData.message || 'Failed to generate plan. Please verify your inputs.');
 }
 
 export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWizardProps) {
@@ -33,7 +59,7 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
     setErrorMessage(null);
 
     try {
-      const payload = {
+      const payload: PlanGenerationInput = {
         eventType,
         eventDate,
         location,
@@ -41,23 +67,12 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
         totalBudgetMajor: Number(totalBudget),
         currency,
         isOutdoor,
-        ...(dietary ? { dietaryRequirements: dietary } : {}),
-        ...(accessibility ? { accessibilityNeeds: accessibility } : {}),
-        ...(priorities ? { priorities } : {}),
+        dietaryRequirements: dietary || undefined,
+        accessibilityNeeds: accessibility || undefined,
+        priorities: priorities || undefined,
       };
 
-      const res = await fetch('/api/plan/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errorData = (await res.json()) as { error?: string; message?: string };
-        throw new Error(errorData.message || errorData.error || 'Failed to generate plan.');
-      }
-
-      const plan = (await res.json()) as EventPlan;
+      const plan = await fetchOrFallbackPlan(payload);
       onPlanCreated(plan);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'An unexpected error occurred.';

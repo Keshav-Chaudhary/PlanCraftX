@@ -6,7 +6,7 @@ export interface RateLimitResult {
   readonly remaining: number;
   readonly resetMs: number;
   readonly retryAfterSec: number;
-  readonly mode: 'redis' | 'memory';
+  readonly mode: 'redis' | 'memory' | 'fallback-memory';
 }
 
 export interface RateLimiter {
@@ -111,7 +111,8 @@ export class UpstashRedisRateLimiter implements RateLimiter {
       // Sliding window via sorted set in Redis
       const pipeline = this.redis.pipeline();
       pipeline.zremrangebyscore(key, 0, windowStart);
-      pipeline.zadd(key, { score: now, member: `${now}:${Math.random()}` });
+      const memberId = `${now}:${crypto.randomUUID()}`;
+      pipeline.zadd(key, { score: now, member: memberId });
       pipeline.zcard(key);
       pipeline.pexpire(key, this.windowMs);
 

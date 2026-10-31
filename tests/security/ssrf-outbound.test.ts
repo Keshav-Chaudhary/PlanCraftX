@@ -1,0 +1,120 @@
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import {
+  validateOutboundUrl,
+  secureFetch,
+  SsrffSecurityError,
+} from '../../lib/security/secure-fetch';
+
+describe('Security: SSRF Outbound Destination Defense', () => {
+  const originalEnv = process.env.NODE_ENV;
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalEnv;
+    vi.restoreAllMocks();
+  });
+
+  it('permits approved production upstream destinations', () => {
+    process.env.NODE_ENV = 'production';
+    const parsed = validateOutboundUrl('https://api.frankfurter.app/latest');
+    expect(parsed.hostname).toBe('api.frankfurter.app');
+  });
+
+  it('blocks unapproved external domains', () => {
+    process.env.NODE_ENV = 'production';
+    expect(() => validateOutboundUrl('https://evil-attacker.com/steal')).toThrowError(
+      SsrffSecurityError,
+    );
+  });
+
+  it('blocks subdomain suffix confusion attempts', () => {
+    process.env.NODE_ENV = 'production';
+    expect(() =>
+      validateOutboundUrl('https://generativelanguage.googleapis.com.attacker.com/api'),
+    ).toThrowError(SsrffSecurityError);
+  });
+
+  it('blocks insecure HTTP in production', () => {
+    process.env.NODE_ENV = 'production';
+    expect(() => validateOutboundUrl('http://api.frankfurter.app/latest')).toThrowError(
+      SsrffSecurityError,
+    );
+  });
+
+  it('blocks private IPv4 spaces and loopback in production', () => {
+    process.env.NODE_ENV = 'production';
+    expect(() => validateOutboundUrl('https://127.0.0.1/admin')).toThrowError(SsrffSecurityError);
+    expect(() => validateOutboundUrl('https://10.0.0.1/internal')).toThrowError(SsrffSecurityError);
+    expect(() => validateOutboundUrl('https://192.168.1.1/router')).toThrowError(
+      SsrffSecurityError,
+    );
+  });
+
+  it('blocks cloud metadata endpoint (169.254.169.254)', () => {
+    expect(() => validateOutboundUrl('http://169.254.169.254/computeMetadata/v1/')).toThrowError(
+      SsrffSecurityError,
+    );
+  });
+
+  it('blocks credential-bearing URLs', () => {
+    expect(() => validateOutboundUrl('https://admin:secret@api.frankfurter.app/data')).toThrowError(
+      SsrffSecurityError,
+    );
+  });
+
+  it('blocks non-standard ports in production', () => {
+    process.env.NODE_ENV = 'production';
+    expect(() => validateOutboundUrl('https://api.frankfurter.app:8443/latest')).toThrowError(
+      SsrffSecurityError,
+    );
+  });
+
+  it('enforces redirect: "error" to defeat redirect-based SSRF', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({}),
+    } as Response);
+
+    await secureFetch('https://api.frankfurter.app/latest');
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.frankfurter.app/latest',
+      expect.objectContaining({ redirect: 'error' }),
+    );
+  });
+
+  it('rejects unexpected content-type when expectedContentType is specified', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'text/html' }),
+    } as Response);
+
+    await expect(
+      secureFetch('https://api.frankfurter.app/latest', {
+        expectedContentType: 'application/json',
+      }),
+    ).rejects.toThrowError(SsrffSecurityError);
+  });
+
+  it('rejects oversized responses when content-length exceeds maxBytes', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({
+        'content-type': 'application/json',
+        'content-length': '5000000',
+      }),
+    } as Response);
+
+    await expect(
+      secureFetch('https://api.frankfurter.app/latest', {
+        maxResponseSizeBytes: 100000,
+      }),
+    ).rejects.toThrowError(SsrffSecurityError);
+  });
+
+  it('allows localhost in development mode', () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env['VERCEL_ENV'];
+    const parsed = validateOutboundUrl('http://localhost:3000/api/mock');
+    expect(parsed.hostname).toBe('localhost');
+  });
+});

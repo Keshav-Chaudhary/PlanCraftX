@@ -82,12 +82,13 @@ describe('useVendorActions Hook', () => {
 
     act(() => {
       result.current.handleAddOsmVendor({
-        osmId: 998877,
+        osmId: '998877',
         name: 'The Historic Hall',
         displayName: 'The Historic Hall, Austin, TX',
-        lat: 30.2672,
-        lon: -97.7431,
         type: 'venue',
+        category: 'amenity',
+        latitude: 30.2672,
+        longitude: -97.7431,
       });
     });
 
@@ -97,6 +98,6 @@ describe('useVendorActions Hook', () => {
     const updated = firstCall[0] as EventPlan;
     expect(updated.vendorItems).toHaveLength(3);
     expect(updated.vendorItems[0]?.name).toBe('The Historic Hall');
-    expect(updated.vendorItems[0]?.osmId).toBe(998877);
+    expect(updated.vendorItems[0]?.osmId).toBe('998877');
   });
 });

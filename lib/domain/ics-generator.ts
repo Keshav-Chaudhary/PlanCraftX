@@ -4,6 +4,8 @@
  * at 75 octets max, backslash/comma/semicolon escaping, and deterministic UIDs.
  */
 
+import type { EventPlan } from '@/lib/schemas/event-plan';
+
 export interface CalendarEventInput {
   readonly id: string;
   readonly summary: string;
@@ -122,4 +124,23 @@ export function generateIcsCalendar(
   // Fold each line at 75 octets and join with CRLF
   const foldedLines = lines.map(foldIcsLine);
   return foldedLines.join('\r\n') + '\r\n';
+}
+
+/**
+ * Creates an RFC 5545 iCalendar payload for all milestones in an EventPlan.
+ */
+export function createPlanCalendarIcs(plan: EventPlan, generatedAtIso?: string): string {
+  const events: CalendarEventInput[] = plan.timelineItems.map((item) => ({
+    id: item.id,
+    summary: `${item.title} (${item.phase})`,
+    description: item.description ?? `Task for phase: ${item.phase}`,
+    startDate: item.dueDate,
+    location: plan.location,
+  }));
+
+  return generateIcsCalendar(
+    `${plan.title} Timeline`,
+    events,
+    generatedAtIso ?? new Date().toISOString(),
+  );
 }

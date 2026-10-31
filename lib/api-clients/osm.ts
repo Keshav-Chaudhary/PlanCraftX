@@ -1,5 +1,6 @@
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
+import { secureFetch } from '../security/secure-fetch';
 
 export interface OsmPlace {
   readonly osmId: string;
@@ -24,13 +25,13 @@ export async function searchOsmPlaces(
   const url = `${env.NOMINATIM_BASE_URL}/search?q=${encodeURIComponent(searchQ)}&format=json&addressdetails=1&limit=${limit}`;
 
   try {
-    const res = await fetch(url, {
+    const res = await secureFetch(url, {
       headers: {
         'User-Agent':
           'PlanCraftX-Assistant/1.0 (https://PlanCraftX.local; contact@PlanCraftX.local)',
         Accept: 'application/json',
       },
-      signal: AbortSignal.timeout(8000),
+      timeoutMs: 8000,
     });
 
     if (!res.ok) {

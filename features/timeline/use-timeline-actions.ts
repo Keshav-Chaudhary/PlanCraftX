@@ -1,15 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import type { EventPlan, TimelineItem, TimelineStatusEnum } from '@/lib/schemas/event-plan';
-import { generateIcsCalendar } from '@/lib/domain/ics-generator';
-import type { PublicHoliday } from '@/lib/domain/timeline-engine';
-
-const NEXT_STATUS: Record<TimelineStatusEnum, TimelineStatusEnum> = {
-  pending: 'in_progress',
-  in_progress: 'completed',
-  completed: 'pending',
-};
+import type { EventPlan, TimelineItem } from '@/lib/schemas/event-plan';
+import { createPlanCalendarIcs } from '@/lib/domain/ics-generator';
+import { cycleMilestoneStatus, type PublicHoliday } from '@/lib/domain/timeline-engine';
 
 export function useTimelineActions(
   plan: EventPlan,
@@ -39,35 +33,12 @@ export function useTimelineActions(
   }, [plan.eventDate]);
 
   const toggleStatus = (item: TimelineItem) => {
-    const updatedItems = plan.timelineItems.map((t) => {
-      if (t.id === item.id) {
-        return { ...t, status: NEXT_STATUS[t.status] };
-      }
-      return t;
-    });
-
-    onPlanUpdate({
-      ...plan,
-      timelineItems: updatedItems,
-      updatedAt: new Date().toISOString(),
-    });
+    const updatedPlan = cycleMilestoneStatus(plan, item.id);
+    onPlanUpdate(updatedPlan);
   };
 
   const handleExportIcs = () => {
-    const events = plan.timelineItems.map((item) => ({
-      id: item.id,
-      summary: `${item.title} (${item.phase})`,
-      description: item.description ?? `Task for phase: ${item.phase}`,
-      startDate: item.dueDate,
-      location: plan.location,
-    }));
-
-    const icsContent = generateIcsCalendar(
-      `${plan.title} Timeline`,
-      events,
-      new Date().toISOString(),
-    );
-
+    const icsContent = createPlanCalendarIcs(plan);
     const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');

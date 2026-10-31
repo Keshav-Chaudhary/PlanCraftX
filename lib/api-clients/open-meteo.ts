@@ -1,5 +1,6 @@
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
+import { secureFetch } from '../security/secure-fetch';
 
 export interface WeatherData {
   readonly maxTempC: number;
@@ -38,7 +39,7 @@ export async function searchCoordinates(
   const url = `${env.OPEN_METEO_GEOCODING_BASE_URL}/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const res = await secureFetch(url, { timeoutMs: 8000 });
     if (!res.ok) {
       return err({
         code: 'UPSTREAM_ERROR',
@@ -107,7 +108,7 @@ export async function fetchWeatherForecast(
   const url = `${env.OPEN_METEO_FORECAST_BASE_URL}/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&start_date=${date}&end_date=${date}`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const res = await secureFetch(url, { timeoutMs: 8000 });
     if (!res.ok) {
       return err({
         code: 'UPSTREAM_ERROR',

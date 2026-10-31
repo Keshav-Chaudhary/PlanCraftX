@@ -4,6 +4,8 @@ export const dynamic = 'force-static';
 
 export async function GET() {
   const mem = process.memoryUsage();
+  const isProd = process.env.NODE_ENV === 'production';
+  const nodeMajor = process.version.split('.')[0] || 'v20';
 
   return NextResponse.json(
     {
@@ -16,9 +18,9 @@ export async function GET() {
         rssMb: Math.round(mem.rss / 1024 / 1024),
       },
       system: {
-        nodeVersion: process.version,
-        platform: process.platform,
-        arch: process.arch,
+        nodeVersion: isProd ? `${nodeMajor}.x` : process.version,
+        platform: isProd ? 'cloud-runtime' : process.platform,
+        arch: isProd ? 'x86_64' : process.arch,
       },
     },
     {

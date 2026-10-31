@@ -34,6 +34,14 @@ function getModelCandidates(primaryModel: string): string[] {
   return Array.from(new Set([primaryModel, ...FALLBACK_MODELS]));
 }
 
+function sanitizeErrorMessage(msg: string): string {
+  // Redact potential API keys, sensitive tokens, and query credentials
+  return msg
+    .replace(/key=[^&\s]+/gi, 'key=[REDACTED]')
+    .replace(/bearer\s+[A-Za-z0-9._-]+/gi, 'Bearer [REDACTED]')
+    .replace(/[a-zA-Z0-9_\-]{32,}/g, '[REDACTED_TOKEN]');
+}
+
 async function querySingleModel<T>(
   ai: GoogleGenAI,
   model: string,
@@ -121,7 +129,7 @@ export async function generateGeminiStructured<T>(
 
   return err({
     code: 'UPSTREAM_FAILURE',
-    message: `Gemini API call failed across all candidate models: ${lastErrorMsg}`,
+    message: `Gemini API call failed across all candidate models: ${sanitizeErrorMessage(lastErrorMsg)}`,
   });
 }
 

@@ -1,6 +1,7 @@
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
 import type { PublicHoliday } from '../domain/timeline-engine';
+import { secureFetch } from '../security/secure-fetch';
 
 export async function fetchPublicHolidays(
   year: number,
@@ -10,7 +11,7 @@ export async function fetchPublicHolidays(
   const url = `${env.NAGER_DATE_BASE_URL}/api/v3/PublicHolidays/${year}/${encodeURIComponent(countryCode.toUpperCase())}`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const res = await secureFetch(url, { timeoutMs: 8000 });
     if (!res.ok) {
       return err({
         code: 'UPSTREAM_ERROR',

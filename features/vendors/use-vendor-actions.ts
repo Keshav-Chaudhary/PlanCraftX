@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import type { EventPlan, VendorItem, VendorStatusEnum } from '@/lib/schemas/event-plan';
 import type { OsmPlace } from '@/lib/api-clients/osm';
+import { updateVendorStatus, addVendorToPlan, buildOsmVendor } from '@/lib/domain/event-rules';
 
 export function useVendorActions(plan: EventPlan, onPlanUpdate: (updatedPlan: EventPlan) => void) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -13,45 +14,20 @@ export function useVendorActions(plan: EventPlan, onPlanUpdate: (updatedPlan: Ev
   );
 
   const handleStatusChange = (vendorId: string, newStatus: VendorStatusEnum) => {
-    const updated = plan.vendorItems.map((v) => {
-      if (v.id === vendorId) {
-        return { ...v, status: newStatus };
-      }
-      return v;
-    });
-    onPlanUpdate({
-      ...plan,
-      vendorItems: updated,
-      updatedAt: new Date().toISOString(),
-    });
+    const updatedPlan = updateVendorStatus(plan, vendorId, newStatus);
+    onPlanUpdate(updatedPlan);
   };
 
   const handleAddOsmVendor = (place: OsmPlace) => {
     const targetCat = categories[0] || 'Venue';
-    const newVendor: VendorItem = {
-      id: `vendor-osm-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-      category: targetCat,
-      name: place.name,
-      status: 'to_contact',
-      contactInfo: place.displayName,
-      notes: `Discovered via OpenStreetMap (OSM ID: ${place.osmId})`,
-      isEstimate: false,
-      osmId: place.osmId,
-    };
-
-    onPlanUpdate({
-      ...plan,
-      vendorItems: [newVendor, ...plan.vendorItems],
-      updatedAt: new Date().toISOString(),
-    });
+    const newVendor = buildOsmVendor(place.osmId, place.name, place.displayName, targetCat);
+    const updatedPlan = addVendorToPlan(plan, newVendor);
+    onPlanUpdate(updatedPlan);
   };
 
   const handleSaveQuoteVendor = (vendor: VendorItem) => {
-    onPlanUpdate({
-      ...plan,
-      vendorItems: [vendor, ...plan.vendorItems],
-      updatedAt: new Date().toISOString(),
-    });
+    const updatedPlan = addVendorToPlan(plan, vendor);
+    onPlanUpdate(updatedPlan);
   };
 
   const filteredVendors = useMemo(() => {

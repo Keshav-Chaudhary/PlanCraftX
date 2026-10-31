@@ -37,7 +37,7 @@ test.describe('Event Taxonomy Differentiation', () => {
     const submitBtn = page.locator('#generate-plan-submit-btn');
     await submitBtn.scrollIntoViewIfNeeded();
     await submitBtn.click({ force: true });
-    await expect(page).toHaveURL(/\/plan$/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/plan\/?$/, { timeout: 15000 });
 
     // Verify Birthday badge and title
     await expect(page.locator('h1').first()).toContainText('BIRTHDAY');
@@ -74,7 +74,7 @@ test.describe('Event Taxonomy Differentiation', () => {
     const submitBtn = page.locator('#generate-plan-submit-btn');
     await submitBtn.scrollIntoViewIfNeeded();
     await submitBtn.click({ force: true });
-    await expect(page).toHaveURL(/\/plan$/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/plan\/?$/, { timeout: 15000 });
 
     // Verify Community badge
     await expect(page.locator('h1').first()).toContainText('COMMUNITY');

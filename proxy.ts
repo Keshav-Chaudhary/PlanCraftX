@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createRateLimiter } from './lib/domain/rate-limiter';
+import { getRateLimitIdentifier } from './lib/security/client-ip';
 
 // Global singleton rate limiter instance for request proxying
 const rateLimiter = createRateLimiter(
@@ -18,9 +19,7 @@ export default async function proxy(request: NextRequest) {
 
   // Rate Limiting on API endpoints
   if (request.nextUrl.pathname.startsWith('/api')) {
-    const forwardedFor = request.headers.get('x-forwarded-for');
-    const ip = forwardedFor ? forwardedFor.split(',')[0]?.trim() : '127.0.0.1';
-    const identifier = `${ip || 'anonymous'}:${request.nextUrl.pathname}`;
+    const identifier = getRateLimitIdentifier(request.headers, request.nextUrl.pathname);
 
     const limitResult = await rateLimiter.limit(identifier);
 
@@ -76,10 +75,18 @@ export default async function proxy(request: NextRequest) {
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  response.headers.set('Cross-Origin-Resource-Policy', 'same-origin');
   response.headers.set(
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   );
+  if (!isDev) {
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=63072000; includeSubDomains; preload',
+    );
+  }
 
   return response;
 }

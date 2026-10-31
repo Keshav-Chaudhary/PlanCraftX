@@ -102,6 +102,30 @@ function migrateV0ToV1(raw: RawV0Plan): Record<string, unknown> {
 }
 
 /**
+ * Recursively strips dangerous prototype-polluting properties (`__proto__`, `constructor`, `prototype`)
+ * from parsed untrusted objects before schema processing.
+ */
+export function sanitizePrototypePollution<T>(input: T): T {
+  if (input === null || typeof input !== 'object') {
+    return input;
+  }
+
+  if (Array.isArray(input)) {
+    return input.map((item) => sanitizePrototypePollution(item)) as unknown as T;
+  }
+
+  const cleanObj = Object.create(null) as Record<string, unknown>;
+  for (const [key, val] of Object.entries(input)) {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      continue;
+    }
+    Object.assign(cleanObj, { [key]: sanitizePrototypePollution(val) });
+  }
+
+  return cleanObj as T;
+}
+
+/**
  * Safely parses and validates an exported plan JSON string.
  * Enforces file size boundaries, schema migrations, and domain invariants.
  */
@@ -133,7 +157,8 @@ export function importPlanJson(rawJsonString: string): Result<EventPlan, Storage
     });
   }
 
-  const record = parsed as Record<string, unknown>;
+  const sanitized = sanitizePrototypePollution(parsed) as Record<string, unknown>;
+  const record = sanitized;
   const version = record['schemaVersion'];
 
   let candidate: Record<string, unknown> = record;

@@ -4,6 +4,8 @@
  * that allocated category sums always equal the total budget exactly.
  */
 
+import type { EventPlan, BudgetItem } from '@/lib/schemas/event-plan';
+
 const CURRENCY_EXPONENTS = new Map<string, number>([
   // Zero-decimal currencies
   ['JPY', 0],
@@ -196,4 +198,41 @@ export function convertCurrency(
   const fromMajor = minorToMajor(amountMinor, fromCurrency);
   const toMajor = fromMajor * rate;
   return majorToMinor(toMajor, toCurrency);
+}
+
+/**
+ * Immutably updates a single budget item allocation in a plan and rebalances remaining categories.
+ */
+export function updateBudgetItemAllocation(
+  plan: EventPlan,
+  itemId: string,
+  newAllocatedMajor: number,
+): EventPlan {
+  if (isNaN(newAllocatedMajor) || newAllocatedMajor < 0) {
+    return plan;
+  }
+
+  const newMinor = majorToMinor(newAllocatedMajor, plan.currency);
+  const updatedItems = plan.budgetItems.map((it) => ({
+    category: it.category,
+    allocatedMinor: it.id === itemId ? newMinor : it.allocatedMinor,
+    isLocked: it.id === itemId,
+  }));
+
+  const rebalanced = rebalanceAllocations(plan.totalBudgetMinor, updatedItems);
+  const rebalancedMap = new Map(rebalanced.map((r) => [r.category, r.allocatedMinor]));
+
+  const newBudgetItems: BudgetItem[] = plan.budgetItems.map((it) => {
+    const updatedAlloc = rebalancedMap.get(it.category);
+    return {
+      ...it,
+      allocatedMinor: updatedAlloc !== undefined ? updatedAlloc : it.allocatedMinor,
+    };
+  });
+
+  return {
+    ...plan,
+    budgetItems: newBudgetItems,
+    updatedAt: new Date().toISOString(),
+  };
 }

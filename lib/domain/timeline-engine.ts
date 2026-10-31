@@ -4,6 +4,7 @@
  */
 
 import { type EventType, TIMELINE_PHASES, PHASE_IDEAL_LEAD_DAYS } from './event-rules';
+import type { EventPlan, TimelineStatusEnum } from '@/lib/schemas/event-plan';
 
 export interface CalendarDateParts {
   readonly year: number;
@@ -175,5 +176,29 @@ export function checkHolidayClash(
   return {
     dueDate,
     hasClash: false,
+  };
+}
+
+const NEXT_MILESTONE_STATUS: Record<TimelineStatusEnum, TimelineStatusEnum> = {
+  pending: 'in_progress',
+  in_progress: 'completed',
+  completed: 'pending',
+};
+
+/**
+ * Cycles milestone status pending -> in_progress -> completed -> pending immutably.
+ */
+export function cycleMilestoneStatus(plan: EventPlan, milestoneId: string): EventPlan {
+  const updatedItems = plan.timelineItems.map((t) => {
+    if (t.id === milestoneId) {
+      return { ...t, status: NEXT_MILESTONE_STATUS[t.status] };
+    }
+    return t;
+  });
+
+  return {
+    ...plan,
+    timelineItems: updatedItems,
+    updatedAt: new Date().toISOString(),
   };
 }
