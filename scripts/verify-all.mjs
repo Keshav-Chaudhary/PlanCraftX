@@ -9,7 +9,7 @@ const steps = [
   { name: 'Production Dependency Audit', command: 'npm run audit' },
 ];
 
-console.log('=== PlanCraft Verification Suite ===\n');
+console.log('=== PlanCraftX Verification Suite ===\n');
 let hasFailure = false;
 
 for (const step of steps) {

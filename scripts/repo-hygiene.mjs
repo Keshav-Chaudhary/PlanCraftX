@@ -48,7 +48,7 @@ function scanDirectory(dir, fileList = []) {
   return fileList;
 }
 
-console.log('--- PlanCraft Repository Hygiene Check ---');
+console.log('--- PlanCraftX Repository Hygiene Check ---');
 const allFiles = scanDirectory(ROOT_DIR);
 let violationCount = 0;
 

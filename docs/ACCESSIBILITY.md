@@ -1,6 +1,6 @@
 # Accessibility (WCAG 2.2 AA & Targeted AAA) Conformance Matrix
 
-PlanCraft is committed to inclusive event planning for all users regardless of ability, neurodivergence, or assistive technology setup.
+PlanCraftX is committed to inclusive event planning for all users regardless of ability, neurodivergence, or assistive technology setup.
 
 ---
 

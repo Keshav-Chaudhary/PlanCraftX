@@ -32,4 +32,26 @@ describe('HTTP Security Headers & Rate Limiting Proxy', () => {
     expect(response.headers.get('X-RateLimit-Remaining')).toBeDefined();
     expect(response.headers.get('X-RateLimit-Mode')).toMatch(/^(redis|memory)$/);
   });
+
+  it('permits unsafe-eval only in development mode for React hot reload and devtools', async () => {
+    const originalEnv = process.env.NODE_ENV;
+    try {
+      // @ts-expect-error test override
+      process.env.NODE_ENV = 'development';
+      const devRequest = new NextRequest(new URL('http://localhost:3000/'));
+      const devResponse = await proxy(devRequest);
+      const devCsp = devResponse.headers.get('Content-Security-Policy');
+      expect(devCsp).toContain("'unsafe-eval'");
+
+      // @ts-expect-error test override
+      process.env.NODE_ENV = 'production';
+      const prodRequest = new NextRequest(new URL('http://localhost:3000/'));
+      const prodResponse = await proxy(prodRequest);
+      const prodCsp = prodResponse.headers.get('Content-Security-Policy');
+      expect(prodCsp).not.toContain("'unsafe-eval'");
+    } finally {
+      // @ts-expect-error test restore
+      process.env.NODE_ENV = originalEnv;
+    }
+  });
 });

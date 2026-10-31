@@ -1,45 +1,45 @@
 @import 'tailwindcss';
 
 :root {
-  --color-bg: #f8fafc;
-  --color-fg: #0f172a;
+  --color-bg: #fcfbf9;
+  --color-fg: #191817;
   --color-surface: #ffffff;
-  --color-surface-elevated: #f1f5f9;
-  --color-border: #cbd5e1;
-  --color-primary: #059669;
+  --color-surface-elevated: #f5f2eb;
+  --color-border: #e3ded6;
+  --color-primary: #1b3d2f;
   --color-primary-fg: #ffffff;
-  --color-muted: #64748b;
-  --color-muted-fg: #334155;
-  --color-accent: #2563eb;
+  --color-muted: #57534e;
+  --color-muted-fg: #292524;
+  --color-accent: #b45309;
   --color-accent-fg: #ffffff;
-  --color-danger: #dc2626;
+  --color-danger: #b91c1c;
   --color-danger-fg: #ffffff;
-  --color-warning: #d97706;
+  --color-warning: #92400e;
   --color-warning-fg: #ffffff;
-  --color-info: #0284c7;
+  --color-info: #0369a1;
   --color-info-fg: #ffffff;
-  --focus-ring: #2563eb;
+  --focus-ring: #1b3d2f;
 }
 
 [data-theme='dark'] {
-  --color-bg: #090d16;
-  --color-fg: #f8fafc;
-  --color-surface: #111827;
-  --color-surface-elevated: #1e293b;
-  --color-border: #334155;
-  --color-primary: #10b981;
-  --color-primary-fg: #090d16;
+  --color-bg: #0c0f14;
+  --color-fg: #f4f4f5;
+  --color-surface: #131720;
+  --color-surface-elevated: #1a202c;
+  --color-border: #28303e;
+  --color-primary: #34d399;
+  --color-primary-fg: #0c0f14;
   --color-muted: #94a3b8;
-  --color-muted-fg: #cbd5e1;
-  --color-accent: #3b82f6;
-  --color-accent-fg: #ffffff;
-  --color-danger: #ef4444;
-  --color-danger-fg: #ffffff;
-  --color-warning: #f59e0b;
-  --color-warning-fg: #090d16;
+  --color-muted-fg: #e2e8f0;
+  --color-accent: #fb923c;
+  --color-accent-fg: #0c0f14;
+  --color-danger: #f87171;
+  --color-danger-fg: #0c0f14;
+  --color-warning: #facc15;
+  --color-warning-fg: #0c0f14;
   --color-info: #38bdf8;
-  --color-info-fg: #090d16;
-  --focus-ring: #60a5fa;
+  --color-info-fg: #0c0f14;
+  --focus-ring: #34d399;
 }
 
 [data-theme='high-contrast'] {
@@ -72,12 +72,20 @@ body {
     BlinkMacSystemFont,
     'Segoe UI',
     Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
     sans-serif;
   line-height: 1.5;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Accessible focus ring (WCAG 2.4.11 / 2.4.13: >= 3:1 contrast, unobscured) */
@@ -102,4 +110,18 @@ body {
 
 .skip-link:focus {
   top: 1rem;
+}
+
+@media print {
+  nav,
+  header,
+  aside,
+  button,
+  .print\:hidden {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
 }

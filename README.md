@@ -1,13 +1,13 @@
-# PlanCraft: GenAI Event Planning Assistant
+# PlanCraftX: GenAI Event Planning Assistant
 
-[![CI](https://github.com/placeholder/plancraft-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/placeholder/plancraft-assistant/actions/workflows/ci.yml)
+[![CI](https://github.com/placeholder/PlanCraftX-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/placeholder/PlanCraftX-assistant/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/Coverage-98.7%25-brightgreen.svg)](<>)
-[![CodeQL](https://github.com/placeholder/plancraft-assistant/actions/workflows/codeql.yml/badge.svg)](https://github.com/placeholder/plancraft-assistant/actions/workflows/codeql.yml)
-[![Gitleaks](https://github.com/placeholder/plancraft-assistant/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/placeholder/plancraft-assistant/actions/workflows/gitleaks.yml)
+[![CodeQL](https://github.com/placeholder/PlanCraftX-assistant/actions/workflows/codeql.yml/badge.svg)](https://github.com/placeholder/PlanCraftX-assistant/actions/workflows/codeql.yml)
+[![Gitleaks](https://github.com/placeholder/PlanCraftX-assistant/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/placeholder/PlanCraftX-assistant/actions/workflows/gitleaks.yml)
 [![WCAG 2.2 AA](https://img.shields.io/badge/WCAG-2.2%20AA-blue.svg)](<>)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-PlanCraft is a GenAI-powered planning assistant designed to help users organize **weddings**, **birthdays**, and **community events** with integer-normalized budgets, reverse-planned timelines, vendor checklists, and personalized ideas.
+PlanCraftX is a GenAI-powered planning assistant designed to help users organize **weddings**, **birthdays**, and **community events** with integer-normalized budgets, reverse-planned timelines, vendor checklists, and personalized ideas.
 
 First screen states what the product does and lets the user start immediately — **no signup or authentication required**.
 
@@ -56,8 +56,8 @@ flowchart TD
 ## 5-Command Quickstart
 
 ```bash
-git clone https://github.com/placeholder/plancraft-assistant.git
-cd plancraft-assistant
+git clone https://github.com/placeholder/PlanCraftX-assistant.git
+cd PlanCraftX-assistant
 npm ci
 cp .env.example .env.local
 npm run dev

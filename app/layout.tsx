@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ThemeToggle } from '@/features/theme-toggle';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'PlanCraft - GenAI Event Planning Assistant',
+  title: 'PlanCraftX - GenAI Event Planning Assistant',
   description:
     'Organize weddings, birthdays, and community events with AI-driven budgets, timelines, vendor checklists, and personalized ideas.',
 };
@@ -20,25 +22,41 @@ export default function RootLayout({
         </a>
         <header className="border-border bg-surface border-b px-4 py-3 sm:px-8" role="banner">
           <div className="mx-auto flex max-w-7xl items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-primary text-xl font-bold tracking-tight">PlanCraft</span>
+            <Link href="/" className="text-decoration-none flex items-center space-x-3">
+              <span className="text-primary text-xl font-bold tracking-tight">PlanCraftX</span>
               <span className="bg-surface-elevated text-muted rounded-full px-2.5 py-0.5 text-xs font-semibold">
                 GenAI Planning Assistant
               </span>
-            </div>
-            <nav aria-label="Main Navigation">
+            </Link>
+            <nav aria-label="Main Navigation" className="flex items-center space-x-4">
               <ul className="flex items-center space-x-4 text-sm font-medium">
                 <li>
-                  <a href="#about" className="hover:text-primary">
-                    About
-                  </a>
+                  <Link href="/" className="hover:text-primary transition-colors">
+                    Home
+                  </Link>
                 </li>
                 <li>
-                  <a href="#privacy" className="hover:text-primary">
+                  <Link
+                    href="/plan"
+                    className="hover:text-primary transition-colors"
+                    id="nav-workspace-link"
+                  >
+                    Workspace
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/settings/privacy"
+                    className="hover:text-primary transition-colors"
+                    id="nav-privacy-link"
+                  >
                     Privacy
-                  </a>
+                  </Link>
                 </li>
               </ul>
+              <div className="border-border border-l pl-3">
+                <ThemeToggle />
+              </div>
             </nav>
           </div>
         </header>
@@ -51,14 +69,21 @@ export default function RootLayout({
           className="border-border bg-surface text-muted border-t py-6 text-center text-xs"
           role="contentinfo"
         >
-          <div className="mx-auto max-w-7xl px-4">
+          <div className="mx-auto max-w-7xl space-y-2 px-4">
             <p>
-              PlanCraft Assistant • Built with official Google GenAI SDK & Open Public Data
+              PlanCraftX Assistant • Built with official Google GenAI SDK & Open Public Data
               (Open-Meteo, Nager.Date, Frankfurter, OpenStreetMap).
             </p>
-            <p className="mt-1">
-              Strict Zero Synthetic Data Policy • Accessible WCAG 2.2 AA compliant.
-            </p>
+            <p>Strict Zero Synthetic Data Policy • Accessible WCAG 2.2 AA compliant.</p>
+            <div className="flex justify-center space-x-4 pt-1">
+              <Link href="/plan" className="hover:underline">
+                Planning Workspace
+              </Link>
+              <span>•</span>
+              <Link href="/settings/privacy" className="hover:underline">
+                Privacy Policy & Data Controls
+              </Link>
+            </div>
           </div>
         </footer>
       </body>

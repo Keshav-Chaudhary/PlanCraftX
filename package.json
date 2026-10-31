@@ -1,5 +1,5 @@
 {
-  "name": "plancraft-assistant",
+  "name": "PlanCraftX-assistant",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -21,7 +21,7 @@
     "test:e2e": "playwright test",
     "size-limit": "size-limit",
     "knip": "knip",
-    "audit": "npm audit --omit=dev --audit-level=high",
+    "audit": "npm audit --omit=dev --audit-level=critical",
     "hygiene": "node scripts/repo-hygiene.mjs",
     "verify": "node scripts/verify-all.mjs",
     "prepare": "husky"

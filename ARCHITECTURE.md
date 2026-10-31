@@ -2,7 +2,7 @@
 
 ## 1. High-Level Architectural Principles
 
-PlanCraft follows clean architectural boundaries where dependencies flow strictly inward:
+PlanCraftX follows clean architectural boundaries where dependencies flow strictly inward:
 `UI Components (features/, app/) -> Domain Logic (lib/domain/) -> Pure Schemas (lib/schemas/)`
 
 - **Domain Purity**: Domain logic (`lib/domain/`) is 100% pure TypeScript. It never imports React, DOM APIs, UI components, or network clients.

@@ -1,6 +1,6 @@
-# Contributing to PlanCraft
+# Contributing to PlanCraftX
 
-Thank you for your interest in contributing to PlanCraft! We enforce high standards of code quality, security, and accessibility.
+Thank you for your interest in contributing to PlanCraftX! We enforce high standards of code quality, security, and accessibility.
 
 ## 1. Development Workflow
 

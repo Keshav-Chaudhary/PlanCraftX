@@ -1,6 +1,6 @@
 # Security Policy & Threat Model (STRIDE & OWASP ASVS)
 
-PlanCraft is architected and implemented following defensive engineering practices aligned with OWASP Top 10 (2021) and the OWASP Application Security Verification Standard (ASVS).
+PlanCraftX is architected and implemented following defensive engineering practices aligned with OWASP Top 10 (2021) and the OWASP Application Security Verification Standard (ASVS).
 
 ---
 

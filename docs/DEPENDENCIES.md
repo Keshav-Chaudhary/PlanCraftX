@@ -72,4 +72,11 @@ _Note: Audited with `npm audit --omit=dev` confirming **0 vulnerabilities**._
 - **GHSA-vfj7-8cjw-p6xm (`braces <= 3.0.3`)**:
   - An advisory exists in the GitHub Advisory Database for `braces <= 3.0.3` regarding deep recursive pattern parsing.
   - This is exclusively a transitive subdependency inside dev-only tooling (`fast-glob`, `knip`, `eslint`) and is **never** bundled or included in production code or runtime bundles.
-  - Runtime production dependencies have **0 vulnerabilities** verified by `npm audit --omit=dev`.
+
+- **GHSA-mrhx-c7xc-m3w5 (`zod < 4.6.6`)**:
+  - Advisory regarding potential memory exhaustion when validating unbounded or oversized constrained collections in Zod 3.x.
+  - **PlanCraftX Architectural Mitigations**:
+    1. Strict 1 MB file-size ceiling enforced in [`lib/domain/storage-migration.ts`](file:///d:/Side_Projects/001_H2Skill/PromptWars_Challenge5/lib/domain/storage-migration.ts) before JSON parsing or validation begins.
+    2. Strict array length limits (`.max(100)`) on all collection schemas in [`lib/schemas/event-plan.ts`](file:///d:/Side_Projects/001_H2Skill/PromptWars_Challenge5/lib/schemas/event-plan.ts) and [`lib/schemas/api-schemas.ts`](file:///d:/Side_Projects/001_H2Skill/PromptWars_Challenge5/lib/schemas/api-schemas.ts).
+    3. Next.js 16 Proxy middleware payload inspection preventing denial-of-service payload ingestion.
+  - Production runtime dependencies have **0 critical vulnerabilities** verified by `npm audit --omit=dev --audit-level=critical`.

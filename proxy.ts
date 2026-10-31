@@ -53,9 +53,15 @@ export default async function proxy(request: NextRequest) {
   }
 
   // Content-Security-Policy (CSP)
+  // React DevTools and Next.js hot module replacement require eval() in development mode
+  const isDev = process.env.NODE_ENV === 'development';
+  const scriptSrc = isDev
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    : "script-src 'self' 'unsafe-inline'";
+
   const cspHeader = [
     "default-src 'self'",
-    "script-src 'self'",
+    scriptSrc,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https://*.tile.openstreetmap.org",
     "font-src 'self' data:",

@@ -122,3 +122,10 @@ export function getEnv(overrideProcessEnv?: Record<string, string | undefined>):
   }
   return parsed.data;
 }
+
+/**
+ * Resets the cached environment singleton. Used in tests when altering process.env.
+ */
+export function resetEnvCache(): void {
+  cachedEnv = null;
+}

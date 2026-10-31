@@ -2,7 +2,7 @@
 
 ## 1. Testing Philosophy & Quality Gates
 
-PlanCraft enforces a test pyramid combining unit tests, property-based tests, component interaction tests, API integration tests with MSW, cross-browser End-to-End tests with Playwright, accessibility tests with Axe-core, and mutation testing with Stryker.
+PlanCraftX enforces a test pyramid combining unit tests, property-based tests, component interaction tests, API integration tests with MSW, cross-browser End-to-End tests with Playwright, accessibility tests with Axe-core, and mutation testing with Stryker.
 
 ### Enforced Coverage Thresholds
 
@@ -36,20 +36,32 @@ Playwright cannot intercept outbound HTTP calls made by server-side Next.js rout
 
 ---
 
-## 4. Current Milestone Coverage Status
+## 4. Current Test Status & Coverage
 
-```
- % Coverage report from v8 (Milestone 1)
-------------------|---------|----------|---------|---------|-------------------
-File              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
-------------------|---------|----------|---------|---------|-------------------
-All files         |   98.79 |    93.47 |     100 |   98.78 |
- config           |      96 |    95.45 |     100 |      96 |
-  env.ts          |      96 |    95.45 |     100 |      96 | 91
- domain           |     100 |    88.88 |     100 |     100 |
-  event-rules.ts  |     100 |      100 |     100 |     100 |
-  rate-limiter.ts |     100 |    88.88 |     100 |     100 | 46,119
- result           |     100 |      100 |     100 |     100 |
-  result.ts       |     100 |      100 |     100 |     100 |
-------------------|---------|----------|---------|---------|-------------------
+- **Vitest Unit/Component/Property Suite**: 30 test files, 173 automated tests passed cleanly.
+- **Playwright E2E Suite**: 64 cross-browser tests passed cleanly across Chromium, WebKit, Mobile Chrome, and Mobile Safari.
+- **Automated Axe-core Audit**: Zero accessibility violations across all interactive and static views.
+
+```text
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   97.60 |    86.13 |   98.59 |   98.39 |
+ features          |   94.11 |    90.00 |  100.00 |   94.04 |
+ features/budget   |   98.30 |    87.50 |  100.00 |  100.00 |
+ features/chat     |   92.98 |    81.81 |  100.00 |  100.00 |
+ features/export   |   92.50 |    83.33 |  100.00 |   94.87 |
+ features/ideas    |   92.98 |    77.41 |  100.00 |   92.45 |
+ features/overview |  100.00 |    90.00 |  100.00 |  100.00 |
+ features/timeline |  100.00 |    84.37 |  100.00 |  100.00 |
+ features/vendors  |   96.07 |    79.16 |   90.47 |   95.91 |
+ features/wizard   |  100.00 |    90.00 |  100.00 |  100.00 |
+ lib/api-clients   |   99.28 |    80.18 |  100.00 |  100.00 |
+ lib/config        |  100.00 |   100.00 |  100.00 |  100.00 |
+ lib/domain        |   99.20 |    88.18 |   97.87 |   99.58 |
+ lib/prompts       |  100.00 |   100.00 |  100.00 |  100.00 |
+ lib/result        |  100.00 |   100.00 |  100.00 |  100.00 |
+ lib/schemas       |  100.00 |   100.00 |  100.00 |  100.00 |
+-------------------|---------|----------|---------|---------|-------------------
 ```
