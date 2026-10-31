@@ -24,6 +24,9 @@
     "audit": "npm audit --omit=dev --audit-level=critical",
     "hygiene": "node scripts/repo-hygiene.mjs",
     "verify": "node scripts/verify-all.mjs",
+    "deploy": "next build --webpack && firebase deploy --only hosting",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
     "prepare": "husky"
   },
   "dependencies": {

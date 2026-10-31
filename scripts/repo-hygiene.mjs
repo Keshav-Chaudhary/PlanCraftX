@@ -14,6 +14,8 @@ const FORBIDDEN_TOKENS = [
 const IGNORED_DIRS = new Set([
   '.git',
   '.next',
+  '.firebase',
+  'out',
   'node_modules',
   'coverage',
   'playwright-report',
