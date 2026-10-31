@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { chromium } from '@playwright/test';
 import path from 'path';
 
 const targetDir = process.argv[2] || 'before';

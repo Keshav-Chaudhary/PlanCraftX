@@ -7,19 +7,15 @@
   ],
   "project": ["app/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}", "scripts/**/*.{js,mjs,ts}"],
   "ignoreDependencies": [
-    "@google/genai",
     "clsx",
     "lucide-react",
     "tailwind-merge",
-    "@axe-core/playwright",
-    "@commitlint/cli",
     "@testing-library/user-event",
     "eslint-config-next",
     "@next/eslint-plugin-next",
-    "fast-check",
-    "lint-staged",
     "msw"
   ],
+  "ignoreBinaries": ["firebase"],
   "rules": {
     "types": "off"
   },
