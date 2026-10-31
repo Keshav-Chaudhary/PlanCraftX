@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import type { EventPlan, VendorItem, VendorStatusEnum } from '@/lib/schemas/event-plan';
-import type { OsmPlace } from '@/lib/api-clients/osm';
+import type { EventPlan, VendorStatusEnum } from '@/lib/schemas/event-plan';
 import { OsmVendorSearch } from './osm-vendor-search';
 import { VendorQuoteAnalyzer } from './vendor-quote-analyzer';
 import { QuoteComparison } from './quote-comparison';
+import { useVendorActions } from './use-vendor-actions';
 
 interface VendorChecklistProps {
   readonly plan: EventPlan;
@@ -13,55 +12,15 @@ interface VendorChecklistProps {
 }
 
 export function VendorChecklist({ plan, onPlanUpdate }: VendorChecklistProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const categories = Array.from(new Set(plan.vendorItems.map((v) => v.category)));
-
-  const handleStatusChange = (vendorId: string, newStatus: VendorStatusEnum) => {
-    const updated = plan.vendorItems.map((v) => {
-      if (v.id === vendorId) {
-        return { ...v, status: newStatus };
-      }
-      return v;
-    });
-    onPlanUpdate({
-      ...plan,
-      vendorItems: updated,
-      updatedAt: new Date().toISOString(),
-    });
-  };
-
-  const handleAddOsmVendor = (place: OsmPlace) => {
-    const targetCat = categories[0] || 'Venue';
-    const newVendor: VendorItem = {
-      id: `vendor-osm-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-      category: targetCat,
-      name: place.name,
-      status: 'to_contact',
-      contactInfo: place.displayName,
-      notes: `Discovered via OpenStreetMap (OSM ID: ${place.osmId})`,
-      isEstimate: false,
-      osmId: place.osmId,
-    };
-
-    onPlanUpdate({
-      ...plan,
-      vendorItems: [newVendor, ...plan.vendorItems],
-      updatedAt: new Date().toISOString(),
-    });
-  };
-
-  const handleSaveQuoteVendor = (vendor: VendorItem) => {
-    onPlanUpdate({
-      ...plan,
-      vendorItems: [vendor, ...plan.vendorItems],
-      updatedAt: new Date().toISOString(),
-    });
-  };
-
-  const filteredVendors = plan.vendorItems.filter((v) => {
-    if (selectedCategory === 'all') return true;
-    return v.category === selectedCategory;
-  });
+  const {
+    selectedCategory,
+    setSelectedCategory,
+    categories,
+    handleStatusChange,
+    handleAddOsmVendor,
+    handleSaveQuoteVendor,
+    filteredVendors,
+  } = useVendorActions(plan, onPlanUpdate);
 
   return (
     <div className="space-y-6">
@@ -75,7 +34,6 @@ export function VendorChecklist({ plan, onPlanUpdate }: VendorChecklistProps) {
         onAcceptQuote={(id) => handleStatusChange(id, 'booked')}
       />
 
-      {/* Filter and Vendor List */}
       <div className="border-border bg-surface rounded-xl border p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4">
           <div>
@@ -137,16 +95,23 @@ export function VendorChecklist({ plan, onPlanUpdate }: VendorChecklistProps) {
                   onChange={(e) =>
                     handleStatusChange(vendor.id, e.target.value as VendorStatusEnum)
                   }
-                  className="border-border bg-surface text-foreground rounded-lg border px-2.5 py-1 text-xs font-medium"
+                  className="border-border bg-surface text-foreground rounded border px-2 py-1 text-xs"
                 >
                   <option value="to_contact">To Contact</option>
+                  <option value="contacted">Contacted</option>
                   <option value="quoted">Quoted</option>
                   <option value="booked">Booked</option>
-                  <option value="paid">Paid</option>
+                  <option value="declined">Declined</option>
                 </select>
               </div>
             </div>
           ))}
+
+          {filteredVendors.length === 0 && (
+            <div className="text-muted py-8 text-center text-sm">
+              No vendors found in this category.
+            </div>
+          )}
         </div>
       </div>
     </div>

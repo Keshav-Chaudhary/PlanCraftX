@@ -2,6 +2,7 @@
 
 import { usePlan, PlanEmptyState } from '@/features/plan-context';
 import { VendorChecklist } from '@/features/vendors/vendor-checklist';
+import { PageHeader, Badge } from '@/features/ui';
 
 export default function VendorsPage() {
   const { plan, updatePlan } = usePlan();
@@ -17,15 +18,11 @@ export default function VendorsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center sm:text-left">
-        <h1 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Vendor Checklist & Nearby Places
-        </h1>
-        <p className="text-muted mt-1 text-sm">
-          Track vendor statuses, quotes, and contract reminders for {plan.location}. Search real
-          nearby suppliers via OpenStreetMap with strict zero synthetic data.
-        </p>
-      </div>
+      <PageHeader
+        title="Vendor Checklist & Nearby Places"
+        description={`Track vendor statuses, quotes, and contract reminders for ${plan.location}. Search real nearby suppliers via OpenStreetMap with strict zero synthetic data.`}
+        badge={<Badge variant="default">OSM Overpass</Badge>}
+      />
 
       <VendorChecklist plan={plan} onPlanUpdate={updatePlan} />
     </div>

@@ -22,6 +22,7 @@ export default defineConfig({
         '**/types/**',
         'tests/**',
         'scripts/**',
+        'features/ui/index.ts',
       ],
       thresholds: {
         lines: 90,

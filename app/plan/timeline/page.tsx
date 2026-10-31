@@ -2,6 +2,7 @@
 
 import { usePlan, PlanEmptyState } from '@/features/plan-context';
 import { TimelineView } from '@/features/timeline/timeline-view';
+import { PageHeader, Badge } from '@/features/ui';
 
 export default function TimelinePage() {
   const { plan, updatePlan } = usePlan();
@@ -17,15 +18,11 @@ export default function TimelinePage() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center sm:text-left">
-        <h1 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Timeline & Milestones
-        </h1>
-        <p className="text-muted mt-1 text-sm">
-          Reverse-planned phase schedule scaled to your event date ({plan.eventDate}), featuring
-          Nager.Date public holiday checks and RFC 5545 calendar export.
-        </p>
-      </div>
+      <PageHeader
+        title="Timeline & Milestones"
+        description={`Reverse-planned phase schedule scaled to your event date (${plan.eventDate}), featuring Nager.Date public holiday checks and RFC 5545 calendar export.`}
+        badge={<Badge variant="info">RFC 5545 Synced</Badge>}
+      />
 
       <TimelineView plan={plan} onPlanUpdate={updatePlan} />
     </div>

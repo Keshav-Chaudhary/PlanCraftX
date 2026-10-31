@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { usePlan } from '@/features/plan-context';
 import { PlanPortability } from '@/features/export/plan-portability';
 import { importPlanJson } from '@/lib/domain/storage-migration';
+import { PageHeader, Badge } from '@/features/ui';
 
 export default function ExportPage() {
   const { plan, updatePlan, resetPlan } = usePlan();
@@ -36,15 +37,11 @@ export default function ExportPage() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center sm:text-left">
-        <h1 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Export, Portability & Backups
-        </h1>
-        <p className="text-muted mt-1 text-sm">
-          Download full JSON plans, generate print-ready summaries, export RFC 5545 calendar files,
-          or restore previous backups.
-        </p>
-      </div>
+      <PageHeader
+        title="Export, Portability & Backups"
+        description="Download full JSON plans, generate print-ready summaries, export RFC 5545 calendar files, or restore previous backups."
+        badge={<Badge variant="info">Zero Lock-In</Badge>}
+      />
 
       {plan ? (
         <PlanPortability plan={plan} onPlanImported={updatePlan} onResetPlan={resetPlan} />

@@ -1,111 +1,45 @@
 'use client';
 
-import { useState } from 'react';
-import type { EventPlan, BudgetItem } from '@/lib/schemas/event-plan';
-import {
-  minorToMajor,
-  majorToMinor,
-  rebalanceAllocations,
-  convertCurrency,
-} from '@/lib/domain/budget-math';
+import type { EventPlan } from '@/lib/schemas/event-plan';
 import { BudgetMetrics } from './budget-metrics';
 import { BudgetTable } from './budget-table';
 import { BudgetTradeoffBanner } from './budget-tradeoff-banner';
 import { AllocationBar } from './allocation-bar';
+import { useBudgetActions } from './use-budget-actions';
 
 interface BudgetPlannerProps {
   readonly plan: EventPlan;
   readonly onPlanUpdate: (updatedPlan: EventPlan) => void;
 }
 
+const SUPPORTED_CURRENCIES = [
+  { value: 'USD', label: 'USD ($) - 2 dec' },
+  { value: 'EUR', label: 'EUR (€) - 2 dec' },
+  { value: 'GBP', label: 'GBP (£) - 2 dec' },
+  { value: 'JPY', label: 'JPY (¥) - 0 dec' },
+  { value: 'KWD', label: 'KWD (KD) - 3 dec' },
+  { value: 'BHD', label: 'BHD (BD) - 3 dec' },
+  { value: 'INR', label: 'INR (₹) - 2 dec' },
+  { value: 'CAD', label: 'CAD ($) - 2 dec' },
+  { value: 'AUD', label: 'AUD ($) - 2 dec' },
+];
+
 export function BudgetPlanner({ plan, onPlanUpdate }: BudgetPlannerProps) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editMajorAmount, setEditMajorAmount] = useState<string>('');
-  const [targetCurrency, setTargetCurrency] = useState(plan.currency);
-  const [conversionLoading, setConversionLoading] = useState(false);
-  const [conversionError, setConversionError] = useState<string | null>(null);
-
-  const totalAllocatedMinor = plan.budgetItems.reduce((acc, it) => acc + it.allocatedMinor, 0);
-  const totalSpentMinor = plan.budgetItems.reduce((acc, it) => acc + it.spentMinor, 0);
-  const remainingMinor = Math.max(0, plan.totalBudgetMinor - totalSpentMinor);
-
-  const startEdit = (item: BudgetItem) => {
-    setEditingId(item.id);
-    setEditMajorAmount(String(minorToMajor(item.allocatedMinor, plan.currency)));
-  };
-
-  const saveEdit = (itemId: string) => {
-    const newMajor = parseFloat(editMajorAmount);
-    if (isNaN(newMajor) || newMajor < 0) {
-      setEditingId(null);
-      return;
-    }
-
-    const newMinor = majorToMinor(newMajor, plan.currency);
-    const updatedItems = plan.budgetItems.map((it) => ({
-      category: it.category,
-      allocatedMinor: it.id === itemId ? newMinor : it.allocatedMinor,
-      isLocked: it.id === itemId,
-    }));
-
-    const rebalanced = rebalanceAllocations(plan.totalBudgetMinor, updatedItems);
-    const rebalancedMap = new Map(rebalanced.map((r) => [r.category, r.allocatedMinor]));
-
-    const newBudgetItems: BudgetItem[] = plan.budgetItems.map((it) => {
-      const updatedAlloc = rebalancedMap.get(it.category);
-      return {
-        ...it,
-        allocatedMinor: updatedAlloc !== undefined ? updatedAlloc : it.allocatedMinor,
-      };
-    });
-
-    onPlanUpdate({
-      ...plan,
-      budgetItems: newBudgetItems,
-      updatedAt: new Date().toISOString(),
-    });
-    setEditingId(null);
-  };
-
-  const handleCurrencySwitch = async (newCurr: string) => {
-    if (newCurr === plan.currency) return;
-    setConversionLoading(true);
-    setConversionError(null);
-
-    try {
-      const res = await fetch('/api/currencies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: plan.currency, to: newCurr }),
-      });
-
-      if (!res.ok) throw new Error('Conversion rate service unavailable.');
-
-      const { rate } = (await res.json()) as { rate: number };
-      const convertedTotal = convertCurrency(plan.totalBudgetMinor, plan.currency, newCurr, rate);
-
-      const convertedItems = plan.budgetItems.map((it) => ({
-        ...it,
-        allocatedMinor: convertCurrency(it.allocatedMinor, plan.currency, newCurr, rate),
-        spentMinor: convertCurrency(it.spentMinor, plan.currency, newCurr, rate),
-      }));
-
-      onPlanUpdate({
-        ...plan,
-        currency: newCurr,
-        totalBudgetMinor: convertedTotal,
-        budgetItems: convertedItems,
-        updatedAt: new Date().toISOString(),
-      });
-      setTargetCurrency(newCurr);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Currency conversion failed.';
-      setConversionError(msg);
-      setTargetCurrency(plan.currency);
-    } finally {
-      setConversionLoading(false);
-    }
-  };
+  const {
+    editingId,
+    editMajorAmount,
+    setEditMajorAmount,
+    targetCurrency,
+    conversionLoading,
+    conversionError,
+    totalAllocatedMinor,
+    totalSpentMinor,
+    remainingMinor,
+    startEdit,
+    cancelEdit,
+    saveEdit,
+    handleCurrencySwitch,
+  } = useBudgetActions(plan, onPlanUpdate);
 
   return (
     <div className="space-y-6">
@@ -146,15 +80,11 @@ export function BudgetPlanner({ plan, onPlanUpdate }: BudgetPlannerProps) {
             onChange={(e) => handleCurrencySwitch(e.target.value)}
             className="border-border bg-surface text-foreground rounded-lg border px-2.5 py-1 text-xs focus:ring-2"
           >
-            <option value="USD">USD ($) - 2 dec</option>
-            <option value="EUR">EUR (€) - 2 dec</option>
-            <option value="GBP">GBP (£) - 2 dec</option>
-            <option value="JPY">JPY (¥) - 0 dec</option>
-            <option value="KWD">KWD (KD) - 3 dec</option>
-            <option value="BHD">BHD (BD) - 3 dec</option>
-            <option value="INR">INR (₹) - 2 dec</option>
-            <option value="CAD">CAD ($) - 2 dec</option>
-            <option value="AUD">AUD ($) - 2 dec</option>
+            {SUPPORTED_CURRENCIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
           </select>
           {conversionLoading && <span className="text-muted text-xs">Converting...</span>}
         </div>
@@ -163,7 +93,7 @@ export function BudgetPlanner({ plan, onPlanUpdate }: BudgetPlannerProps) {
       {conversionError && (
         <div
           role="alert"
-          className="border-danger/30 bg-danger/10 text-danger rounded-lg border p-3 text-xs"
+          className="border-danger/20 bg-danger/10 text-danger rounded-xl border p-4 text-xs font-medium"
         >
           {conversionError}
         </div>
@@ -175,7 +105,7 @@ export function BudgetPlanner({ plan, onPlanUpdate }: BudgetPlannerProps) {
         editMajorAmount={editMajorAmount}
         onStartEdit={startEdit}
         onSaveEdit={saveEdit}
-        onCancelEdit={() => setEditingId(null)}
+        onCancelEdit={cancelEdit}
         onEditAmountChange={setEditMajorAmount}
       />
     </div>

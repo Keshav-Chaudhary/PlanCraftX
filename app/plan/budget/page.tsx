@@ -2,6 +2,7 @@
 
 import { usePlan, PlanEmptyState } from '@/features/plan-context';
 import { BudgetPlanner } from '@/features/budget/budget-planner';
+import { PageHeader, Badge } from '@/features/ui';
 
 export default function BudgetPage() {
   const { plan, updatePlan } = usePlan();
@@ -17,16 +18,11 @@ export default function BudgetPage() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center sm:text-left">
-        <h1 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Budget Planner & Tracking
-        </h1>
-        <p className="text-muted mt-1 text-sm">
-          Strict integer-normalized budget allocations across {plan.currency} minor units. Edit
-          proportions, track actual spending, and convert currencies live with zero hardcoded
-          percentages.
-        </p>
-      </div>
+      <PageHeader
+        title="Budget Planner & Tracking"
+        description={`Strict integer-normalized budget allocations across ${plan.currency} minor units. Edit proportions, track actual spending, and convert currencies live with zero hardcoded percentages.`}
+        badge={<Badge variant="success">Integer Normalized</Badge>}
+      />
 
       <BudgetPlanner plan={plan} onPlanUpdate={updatePlan} />
     </div>

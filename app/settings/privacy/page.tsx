@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { clearPlanFromStorage, loadPlanFromStorage } from '@/features/storage';
 import { exportPlanJson } from '@/lib/domain/storage-migration';
+import { PageHeader, Badge } from '@/features/ui';
 
 export default function PrivacySettingsPage() {
   const [clearedNotice, setClearedNotice] = useState(false);
@@ -35,15 +36,11 @@ export default function PrivacySettingsPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
-      <div>
-        <h1 className="text-foreground text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Privacy Policy & Data Ownership
-        </h1>
-        <p className="text-muted mt-2 text-base leading-relaxed">
-          PlanCraftX is architected with a strict privacy-first and zero-tracking model. You own all
-          of your planning data.
-        </p>
-      </div>
+      <PageHeader
+        title="Privacy Policy & Data Ownership"
+        description="PlanCraftX is architected with a strict privacy-first and zero-tracking model. You own all of your planning data."
+        badge={<Badge variant="success">100% Client-Side Storage</Badge>}
+      />
 
       {clearedNotice && (
         <div

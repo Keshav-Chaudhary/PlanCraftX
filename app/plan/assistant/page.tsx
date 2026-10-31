@@ -2,6 +2,7 @@
 
 import { usePlan, PlanEmptyState } from '@/features/plan-context';
 import { ChatAssistant } from '@/features/chat/chat-assistant';
+import { PageHeader, Badge } from '@/features/ui';
 
 export default function AssistantPage() {
   const { plan } = usePlan();
@@ -17,15 +18,11 @@ export default function AssistantPage() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center sm:text-left">
-        <h1 className="text-foreground text-2xl font-extrabold tracking-tight sm:text-3xl">
-          GenAI Planning Assistant
-        </h1>
-        <p className="text-muted mt-1 text-sm">
-          Interactive planning co-pilot grounded in your {plan.eventType} parameters. Ask about
-          logistics, budget tradeoffs, or weather contingencies.
-        </p>
-      </div>
+      <PageHeader
+        title="GenAI Planning Assistant"
+        description={`Interactive planning co-pilot grounded in your ${plan.eventType} parameters. Ask about logistics, budget tradeoffs, or weather contingencies.`}
+        badge={<Badge variant="success">Plan Grounded</Badge>}
+      />
 
       <ChatAssistant plan={plan} />
     </div>

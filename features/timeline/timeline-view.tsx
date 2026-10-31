@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { EventPlan, TimelineItem, TimelineStatusEnum } from '@/lib/schemas/event-plan';
-import { generateIcsCalendar } from '@/lib/domain/ics-generator';
-import { checkHolidayClash, type PublicHoliday } from '@/lib/domain/timeline-engine';
+import type { EventPlan } from '@/lib/schemas/event-plan';
+import { checkHolidayClash } from '@/lib/domain/timeline-engine';
 import { RunsheetView } from './runsheet-view';
+import { useTimelineActions } from './use-timeline-actions';
 
 interface TimelineViewProps {
   readonly plan: EventPlan;
@@ -12,84 +11,11 @@ interface TimelineViewProps {
 }
 
 export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [holidays, setHolidays] = useState<PublicHoliday[]>([]);
-
-  useEffect(() => {
-    async function loadHolidays() {
-      try {
-        const year = parseInt(plan.eventDate.split('-')[0] ?? '2026', 10);
-        const res = await fetch('/api/holidays', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ year, countryCode: 'US' }),
-        });
-        if (res.ok) {
-          const data = (await res.json()) as { holidays: PublicHoliday[] };
-          setHolidays(data.holidays || []);
-        }
-      } catch {
-        // holidays query is progressive enhancement
-      }
-    }
-    loadHolidays();
-  }, [plan.eventDate]);
-
-  const toggleStatus = (item: TimelineItem) => {
-    const nextStatus: Record<TimelineStatusEnum, TimelineStatusEnum> = {
-      pending: 'in_progress',
-      in_progress: 'completed',
-      completed: 'pending',
-    };
-
-    const updatedItems = plan.timelineItems.map((t) => {
-      if (t.id === item.id) {
-        return { ...t, status: nextStatus[t.status] };
-      }
-      return t;
-    });
-
-    onPlanUpdate({
-      ...plan,
-      timelineItems: updatedItems,
-      updatedAt: new Date().toISOString(),
-    });
-  };
-
-  const handleExportIcs = () => {
-    const events = plan.timelineItems.map((item) => ({
-      id: item.id,
-      summary: `${item.title} (${item.phase})`,
-      description: item.description ?? `Task for phase: ${item.phase}`,
-      startDate: item.dueDate,
-      location: plan.location,
-    }));
-
-    const icsContent = generateIcsCalendar(
-      `${plan.title} Timeline`,
-      events,
-      new Date().toISOString(),
-    );
-
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${plan.eventType}-timeline.ics`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  const filteredItems = plan.timelineItems.filter((item) => {
-    if (filterStatus === 'all') return true;
-    return item.status === filterStatus;
-  });
+  const { filterStatus, setFilterStatus, holidays, toggleStatus, handleExportIcs, filteredItems } =
+    useTimelineActions(plan, onPlanUpdate);
 
   return (
     <div className="space-y-6">
-      {/* Header & Controls */}
       <RunsheetView eventType={plan.eventType} />
 
       <div className="border-border bg-surface flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4 shadow-sm">
@@ -124,14 +50,13 @@ export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
             type="button"
             onClick={handleExportIcs}
             id="export-ics-btn"
-            className="bg-primary text-primary-fg inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-opacity hover:opacity-90"
+            className="bg-primary text-primary-fg inline-flex cursor-pointer items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-opacity hover:opacity-90"
           >
             📅 Export RFC 5545 Calendar (.ics)
           </button>
         </div>
       </div>
 
-      {/* Timeline List */}
       <div className="space-y-4">
         {filteredItems.length === 0 ? (
           <div className="border-border bg-surface text-muted rounded-xl border p-8 text-center text-sm">
@@ -183,7 +108,7 @@ export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
                   <button
                     type="button"
                     onClick={() => toggleStatus(item)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                       item.status === 'completed'
                         ? 'bg-primary text-primary-fg'
                         : item.status === 'in_progress'
