@@ -46,35 +46,23 @@ describe('Rate Limiter Domain & Adapters', () => {
     expect(clientABlocked.success).toBe(false);
   });
 
-  it('handles Upstash Redis normal execution and rate exceeded', async () => {
+  it('handles Upstash Redis normal execution and rate exceeded via atomic Lua eval', async () => {
     const redisLimiter = new UpstashRedisRateLimiter(
       'https://mock-redis.upstash.io',
       'mock-token',
       { maxRequests: 5, windowMs: 60_000 },
     );
 
-    // Mock successful redis pipeline execution under limit
-    vi.spyOn(redisLimiter['redis'], 'pipeline').mockReturnValue({
-      zremrangebyscore: vi.fn().mockReturnThis(),
-      zadd: vi.fn().mockReturnThis(),
-      zcard: vi.fn().mockReturnThis(),
-      pexpire: vi.fn().mockReturnThis(),
-      exec: vi.fn().mockResolvedValue([0, 1, 3, 'OK']),
-    } as unknown as ReturnType<(typeof redisLimiter)['redis']['pipeline']>);
+    // Mock successful redis eval execution under limit: [1 (allowed), 2 (remaining)]
+    vi.spyOn(redisLimiter, 'executeAtomic').mockResolvedValue([1, 2]);
 
     const resAllowed = await redisLimiter.limit('redis-user');
     expect(resAllowed.success).toBe(true);
     expect(resAllowed.mode).toBe('redis');
     expect(resAllowed.remaining).toBe(2);
 
-    // Mock Redis pipeline when count exceeds maxRequests
-    vi.spyOn(redisLimiter['redis'], 'pipeline').mockReturnValue({
-      zremrangebyscore: vi.fn().mockReturnThis(),
-      zadd: vi.fn().mockReturnThis(),
-      zcard: vi.fn().mockReturnThis(),
-      pexpire: vi.fn().mockReturnThis(),
-      exec: vi.fn().mockResolvedValue([0, 1, 6, 'OK']),
-    } as unknown as ReturnType<(typeof redisLimiter)['redis']['pipeline']>);
+    // Mock Redis eval when count exceeds maxRequests: [0 (blocked), 0]
+    vi.spyOn(redisLimiter, 'executeAtomic').mockResolvedValue([0, 0]);
 
     const resBlocked = await redisLimiter.limit('redis-user');
     expect(resBlocked.success).toBe(false);
@@ -83,19 +71,19 @@ describe('Rate Limiter Domain & Adapters', () => {
     expect(resBlocked.retryAfterSec).toBe(60);
   });
 
-  it('gracefully degrades to in-memory limiter on Redis outage (Amendment I)', async () => {
+  it('gracefully degrades to in-memory limiter on Redis outage in non-production', async () => {
     const fallbackLimiter = new InMemoryRateLimiter({ maxRequests: 2, windowMs: 10_000 });
     const redisLimiter = new UpstashRedisRateLimiter(
       'https://mock-redis.upstash.io',
       'mock-token',
-      { maxRequests: 2, windowMs: 10_000 },
+      { maxRequests: 2, windowMs: 10_000, failClosed: false },
       fallbackLimiter,
     );
 
     // Mock Redis network failure
-    vi.spyOn(redisLimiter['redis'], 'pipeline').mockImplementation(() => {
-      throw new Error('ECONNREFUSED - Redis unreachable');
-    });
+    vi.spyOn(redisLimiter, 'executeAtomic').mockRejectedValue(
+      new Error('ECONNREFUSED - Redis unreachable'),
+    );
 
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

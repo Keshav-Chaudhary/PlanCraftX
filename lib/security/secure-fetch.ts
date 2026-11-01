@@ -19,6 +19,8 @@ export class SsrffSecurityError extends Error {
   }
 }
 
+export { SsrffSecurityError as SsrfSecurityError };
+
 const DEFAULT_MAX_RESPONSE_SIZE = 2 * 1024 * 1024; // 2 MB
 const DEFAULT_TIMEOUT_MS = 8000; // 8 seconds
 
@@ -36,6 +38,9 @@ const PRIVATE_IP_PATTERNS = [
 ];
 
 function validateProtocolAndCredentials(parsed: URL, isProd: boolean): void {
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    throw new SsrffSecurityError(`Unsupported outbound protocol: ${parsed.protocol}`);
+  }
   if (isProd && parsed.protocol !== 'https:') {
     throw new SsrffSecurityError(
       `Insecure HTTP protocol disallowed in production: ${parsed.protocol}`,
@@ -77,6 +82,10 @@ function validateTargetHost(hostname: string, isProd: boolean): void {
  * Validates a target URL against SSRF rules before dispatching.
  */
 export function validateOutboundUrl(targetUrl: string): URL {
+  if (/[\u0000-\u001F\u007F]/.test(targetUrl)) {
+    throw new SsrffSecurityError('URL contains disallowed control characters');
+  }
+
   let parsed: URL;
   try {
     parsed = new URL(targetUrl);
@@ -112,6 +121,33 @@ function validateResponseSize(response: Response, maxBytes?: number): void {
 }
 
 /**
+ * Creates a stream transform that tracks byte consumption in real-time,
+ * immediately terminating upstream streaming if it exceeds the maximum allowable limit.
+ */
+function createBoundedStream(
+  body: ReadableStream<Uint8Array>,
+  maxBytes: number,
+): ReadableStream<Uint8Array> {
+  let bytesRead = 0;
+  return body.pipeThrough(
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        bytesRead += chunk.byteLength;
+        if (bytesRead > maxBytes) {
+          controller.error(
+            new SsrffSecurityError(
+              `Upstream response body exceeded maximum allowable limit of ${maxBytes} bytes while streaming`,
+            ),
+          );
+          return;
+        }
+        controller.enqueue(chunk);
+      },
+    }),
+  );
+}
+
+/**
  * Dispatches an outbound HTTP request with SSRF validations, redirect locks,
  * response size bounding, and timeouts.
  */
@@ -133,6 +169,16 @@ export async function secureFetch(
 
   validateResponseContentType(response, options.expectedContentType);
   validateResponseSize(response, options.maxResponseSizeBytes);
+
+  const limit = options.maxResponseSizeBytes ?? DEFAULT_MAX_RESPONSE_SIZE;
+  if (response.body && typeof response.body.pipeThrough === 'function') {
+    const boundedBody = createBoundedStream(response.body, limit);
+    return new Response(boundedBody, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+    });
+  }
 
   return response;
 }

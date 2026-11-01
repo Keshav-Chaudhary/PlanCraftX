@@ -149,6 +149,7 @@ export async function generateGeminiStream(
   const ai = clientRes.value;
 
   let lastErrorMsg = 'Unknown upstream error';
+  let isRateLimited = false;
 
   for (const model of modelsToTry) {
     try {
@@ -168,11 +169,21 @@ export async function generateGeminiStream(
       return ok(textGenerator());
     } catch (error: unknown) {
       lastErrorMsg = error instanceof Error ? error.message : 'Unknown upstream error';
+      if (lastErrorMsg.includes('429') || lastErrorMsg.toLowerCase().includes('quota')) {
+        isRateLimited = true;
+      }
     }
+  }
+
+  if (isRateLimited) {
+    return err({
+      code: 'RATE_LIMITED',
+      message: 'Gemini rate limit exceeded across model fallback chain. Please retry shortly.',
+    });
   }
 
   return err({
     code: 'UPSTREAM_FAILURE',
-    message: `Gemini streaming call failed across all candidate models: ${lastErrorMsg}`,
+    message: `Gemini streaming call failed across all candidate models: ${sanitizeErrorMessage(lastErrorMsg)}`,
   });
 }

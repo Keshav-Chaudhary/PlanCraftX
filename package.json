@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
+    "postbuild": "node scripts/generate-csp-hashes.mjs --update && prettier --write firebase.json",
     "start": "serve out -l 3000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

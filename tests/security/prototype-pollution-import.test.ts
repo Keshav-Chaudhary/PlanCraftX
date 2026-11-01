@@ -43,4 +43,50 @@ describe('Security: Prototype Pollution Sanitization', () => {
     expect(result.success).toBe(true);
     expect(({} as Record<string, unknown>)['isAdmin']).toBeUndefined();
   });
+
+  it('prevents call stack exhaustion on deeply nested malicious payloads', () => {
+    // Construct an object nested 100 levels deep
+    let deepObj: Record<string, unknown> = { leaf: 'value' };
+    for (let i = 0; i < 100; i++) {
+      deepObj = { next: deepObj };
+    }
+
+    expect(() => sanitizePrototypePollution(deepObj)).not.toThrow();
+  });
+
+  it('rejects oversized arrays exceeding MAX_ARRAY_LENGTH', () => {
+    const hugeArray = Array.from({ length: 1005 }, (_, i) => ({ id: `item-${i}` }));
+    const payload = JSON.stringify({
+      schemaVersion: 1,
+      id: 'plan-huge',
+      budgetItems: hugeArray,
+    });
+
+    const result = importPlanJson(payload);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.code).toBe('VALIDATION_FAILED');
+      expect(result.error.message).toContain('exceeds allowable collection complexity boundaries');
+    }
+  });
+
+  it('rejects payloads exceeding MAX_TOTAL_NODES', () => {
+    // Generate object with 5500 keys
+    const wideObj: Record<string, number> = {};
+    for (let i = 0; i < 5500; i++) {
+      wideObj[`key_${i}`] = i;
+    }
+    const payload = JSON.stringify({
+      schemaVersion: 1,
+      id: 'plan-wide',
+      metadata: wideObj,
+    });
+
+    const result = importPlanJson(payload);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.code).toBe('VALIDATION_FAILED');
+      expect(result.error.message).toContain('exceeds allowable collection complexity boundaries');
+    }
+  });
 });

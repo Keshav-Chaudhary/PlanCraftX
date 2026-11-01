@@ -122,9 +122,23 @@ describe('Gemini API Client with @google/genai SDK', () => {
     if (!resGeneric.success) expect(resGeneric.error.code).toBe('UPSTREAM_FAILURE');
 
     // Streaming call throws error
-    mockGenerateContentStream.mockRejectedValue(new Error('Stream network drop'));
+    mockGenerateContentStream.mockRejectedValue(
+      new Error('Stream network drop with key=secret_val_123'),
+    );
     const resStreamErr = await generateGeminiStream('prompt');
     expect(resStreamErr.success).toBe(false);
-    if (!resStreamErr.success) expect(resStreamErr.error.code).toBe('UPSTREAM_FAILURE');
+    if (!resStreamErr.success) {
+      expect(resStreamErr.error.code).toBe('UPSTREAM_FAILURE');
+      expect(resStreamErr.error.message).toContain('key=[REDACTED]');
+      expect(resStreamErr.error.message).not.toContain('secret_val_123');
+    }
+
+    // Streaming call throws 429 rate limit
+    mockGenerateContentStream.mockRejectedValue(new Error('Resource exhausted 429 quota exceeded'));
+    const resStreamRateLimit = await generateGeminiStream('prompt');
+    expect(resStreamRateLimit.success).toBe(false);
+    if (!resStreamRateLimit.success) {
+      expect(resStreamRateLimit.error.code).toBe('RATE_LIMITED');
+    }
   });
 });

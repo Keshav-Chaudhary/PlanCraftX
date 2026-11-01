@@ -8,6 +8,9 @@ import { type Result, ok, err } from '../result/result';
 import { majorToMinor } from './budget-math';
 
 export const MAX_IMPORT_FILE_SIZE_BYTES = 1_048_576; // 1 MB limit
+export const MAX_SANITIZATION_DEPTH = 32;
+export const MAX_ARRAY_LENGTH = 1_000;
+export const MAX_TOTAL_NODES = 5_000;
 
 export interface StorageError {
   readonly code:
@@ -101,35 +104,55 @@ function migrateV0ToV1(raw: RawV0Plan): Record<string, unknown> {
   };
 }
 
+function sanitizeArray(arr: unknown[], depth: number, state: { count: number }): unknown[] {
+  if (arr.length > MAX_ARRAY_LENGTH) {
+    throw new Error('ARRAY_TOO_LARGE');
+  }
+  return arr.map((item) => sanitizePrototypePollution(item, depth + 1, state));
+}
+
+function sanitizeObjectProperties(
+  obj: Record<string, unknown>,
+  depth: number,
+  state: { count: number },
+): Record<string, unknown> {
+  const cleanObj = Object.create(null) as Record<string, unknown>;
+  for (const [key, val] of Object.entries(obj)) {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      continue;
+    }
+    Object.assign(cleanObj, { [key]: sanitizePrototypePollution(val, depth + 1, state) });
+  }
+  return cleanObj;
+}
+
 /**
  * Recursively strips dangerous prototype-polluting properties (`__proto__`, `constructor`, `prototype`)
  * from parsed untrusted objects before schema processing.
+ * Constrained by MAX_SANITIZATION_DEPTH, MAX_ARRAY_LENGTH, and MAX_TOTAL_NODES.
  */
-export function sanitizePrototypePollution<T>(input: T): T {
-  if (input === null || typeof input !== 'object') {
+export function sanitizePrototypePollution<T>(
+  input: T,
+  depth = 0,
+  state: { count: number } = { count: 0 },
+): T {
+  state.count += 1;
+  if (state.count > MAX_TOTAL_NODES) {
+    throw new Error('TOO_MANY_NODES');
+  }
+
+  if (depth > MAX_SANITIZATION_DEPTH || input === null || typeof input !== 'object') {
     return input;
   }
 
   if (Array.isArray(input)) {
-    return input.map((item) => sanitizePrototypePollution(item)) as unknown as T;
+    return sanitizeArray(input, depth, state) as unknown as T;
   }
 
-  const cleanObj = Object.create(null) as Record<string, unknown>;
-  for (const [key, val] of Object.entries(input)) {
-    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
-      continue;
-    }
-    Object.assign(cleanObj, { [key]: sanitizePrototypePollution(val) });
-  }
-
-  return cleanObj as T;
+  return sanitizeObjectProperties(input as Record<string, unknown>, depth, state) as T;
 }
 
-/**
- * Safely parses and validates an exported plan JSON string.
- * Enforces file size boundaries, schema migrations, and domain invariants.
- */
-export function importPlanJson(rawJsonString: string): Result<EventPlan, StorageError> {
+function parseJsonPayload(rawJsonString: string): Result<unknown, StorageError> {
   const encoder = new TextEncoder();
   const byteLength = encoder.encode(rawJsonString).length;
 
@@ -140,38 +163,66 @@ export function importPlanJson(rawJsonString: string): Result<EventPlan, Storage
     });
   }
 
-  let parsed: unknown;
   try {
-    parsed = JSON.parse(rawJsonString);
+    const parsed: unknown = JSON.parse(rawJsonString);
+    if (typeof parsed !== 'object' || parsed === null) {
+      return err({
+        code: 'VALIDATION_FAILED',
+        message: 'Plan file must contain a JSON object at its root.',
+      });
+    }
+    return ok(parsed);
   } catch {
     return err({
       code: 'INVALID_JSON',
       message: 'Failed to parse JSON file. Ensure the file contains valid UTF-8 JSON.',
     });
   }
+}
 
-  if (typeof parsed !== 'object' || parsed === null) {
-    return err({
-      code: 'VALIDATION_FAILED',
-      message: 'Plan file must contain a JSON object at its root.',
-    });
-  }
-
-  const sanitized = sanitizePrototypePollution(parsed) as Record<string, unknown>;
-  const record = sanitized;
+function preparePlanCandidate(
+  record: Record<string, unknown>,
+): Result<Record<string, unknown>, StorageError> {
   const version = record['schemaVersion'];
-
-  let candidate: Record<string, unknown> = record;
   if (version === undefined || version === 0) {
-    candidate = migrateV0ToV1(record as RawV0Plan);
-  } else if (version !== CURRENT_SCHEMA_VERSION) {
+    return ok(migrateV0ToV1(record as RawV0Plan));
+  }
+  if (version !== CURRENT_SCHEMA_VERSION) {
     return err({
       code: 'UNSUPPORTED_VERSION',
       message: `Unsupported plan schema version: ${String(version)}. Current supported version is ${CURRENT_SCHEMA_VERSION}.`,
     });
   }
+  return ok(record);
+}
 
-  const validation = eventPlanSchema.safeParse(candidate);
+/**
+ * Safely parses and validates an exported plan JSON string.
+ * Enforces file size boundaries, schema migrations, and domain invariants.
+ */
+export function importPlanJson(rawJsonString: string): Result<EventPlan, StorageError> {
+  const parseRes = parseJsonPayload(rawJsonString);
+  if (!parseRes.success) return parseRes;
+
+  let sanitized: Record<string, unknown>;
+  try {
+    sanitized = sanitizePrototypePollution(parseRes.value) as Record<string, unknown>;
+  } catch (parseError: unknown) {
+    const isBoundaryError =
+      parseError instanceof Error &&
+      (parseError.message === 'TOO_MANY_NODES' || parseError.message === 'ARRAY_TOO_LARGE');
+    return err({
+      code: 'VALIDATION_FAILED',
+      message: isBoundaryError
+        ? 'Import rejected: payload exceeds allowable collection complexity boundaries.'
+        : 'Failed to process imported object structure.',
+    });
+  }
+
+  const candidateRes = preparePlanCandidate(sanitized);
+  if (!candidateRes.success) return candidateRes;
+
+  const validation = eventPlanSchema.safeParse(candidateRes.value);
   if (!validation.success) {
     const details = validation.error.issues
       .map((i) => `${i.path.join('.')}: ${i.message}`)

@@ -56,4 +56,23 @@ describe('HTTP Security Headers & Rate Limiting Proxy', () => {
       process.env.NODE_ENV = originalEnv;
     }
   });
+
+  it('validates production Firebase Hosting CSP headers contain strict SHA-256 script hashes', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const firebaseJsonPath = path.join(process.cwd(), 'firebase.json');
+    const content = JSON.parse(fs.readFileSync(firebaseJsonPath, 'utf-8'));
+
+    const rootRule = content.hosting.headers.find((r: { source: string }) => r.source === '**');
+    expect(rootRule).toBeDefined();
+
+    const cspHeader = rootRule.headers.find(
+      (h: { key: string }) => h.key === 'Content-Security-Policy',
+    );
+    expect(cspHeader).toBeDefined();
+    expect(cspHeader.value).toContain('sha256-');
+    expect(cspHeader.value).toContain("default-src 'self'");
+    expect(cspHeader.value).toContain("object-src 'none'");
+    expect(cspHeader.value).toContain("frame-ancestors 'none'");
+  });
 });

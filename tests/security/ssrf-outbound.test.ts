@@ -111,6 +111,31 @@ describe('Security: SSRF Outbound Destination Defense', () => {
     ).rejects.toThrowError(SsrffSecurityError);
   });
 
+  it('terminates streaming responses in real-time when body byte count exceeds maxBytes', async () => {
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        // Enqueue two 1KB chunks (total 2048 bytes > 1024 bytes limit)
+        controller.enqueue(new Uint8Array(1024));
+        controller.enqueue(new Uint8Array(1024));
+        controller.close();
+      },
+    });
+
+    const mockResponse = new Response(stream, {
+      headers: new Headers({ 'content-type': 'application/json' }),
+    });
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(mockResponse);
+
+    const res = await secureFetch('https://api.frankfurter.app/latest', {
+      maxResponseSizeBytes: 1024,
+    });
+
+    await expect(res.arrayBuffer()).rejects.toThrowError(
+      /exceeded maximum allowable limit of 1024 bytes/i,
+    );
+  });
+
   it('allows localhost in development mode', () => {
     process.env.NODE_ENV = 'development';
     delete process.env['VERCEL_ENV'];
