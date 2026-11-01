@@ -3,7 +3,7 @@ import {
   InMemoryRateLimiter,
   UpstashRedisRateLimiter,
   createRateLimiter,
-} from '../../lib/domain/rate-limiter';
+} from '../../lib/security/rate-limiter';
 import type { Redis } from '@upstash/redis';
 
 describe('Security: Rate Limiter Concurrency & Boundary Hardening Matrix', () => {

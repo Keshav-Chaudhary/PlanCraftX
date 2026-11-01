@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createRateLimiter } from './lib/domain/rate-limiter';
+import { createRateLimiter } from './lib/security/rate-limiter';
 import { getRateLimitIdentifier } from './lib/security/client-ip';
 
 // Global singleton rate limiter instance for request proxying

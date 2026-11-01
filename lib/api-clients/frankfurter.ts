@@ -1,6 +1,11 @@
+import { z } from 'zod';
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
 import { secureFetch } from '../security/secure-fetch';
+
+const frankfurterResponseSchema = z.object({
+  rates: z.record(z.string(), z.number()).optional(),
+});
 
 export async function fetchExchangeRate(
   from: string,
@@ -25,8 +30,16 @@ export async function fetchExchangeRate(
       });
     }
 
-    const data = (await res.json()) as { rates?: Record<string, number> };
-    const ratesMap = new Map<string, number>(Object.entries(data.rates || {}));
+    const rawJson: unknown = await res.json();
+    const parsed = frankfurterResponseSchema.safeParse(rawJson);
+    if (!parsed.success) {
+      return err({
+        code: 'UPSTREAM_ERROR',
+        message: 'Invalid response structure from Frankfurter API',
+      });
+    }
+
+    const ratesMap = new Map<string, number>(Object.entries(parsed.data.rates || {}));
     const rate = ratesMap.get(toUpper);
 
     if (typeof rate !== 'number' || rate <= 0) {

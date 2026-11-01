@@ -70,7 +70,7 @@ flowchart TD
 ## 5-Command Quickstart
 
 ```bash
-git clone https://github.com/Keshav-Chaudhary/PlanCraftX.git
+git clone https://github.com/PlanCraftX/PlanCraftX.git
 cd PlanCraftX
 npm ci
 cp .env.example .env.local
@@ -129,18 +129,17 @@ Visit [http://localhost:3000](http://localhost:3000) to begin planning immediate
 
 ---
 
-## Testing, Verification & Competition Benchmark
+## Testing & Quality Verification
 
-PlanCraftX maintains industry-leading automated verification standards, exceeding top competition entries across every parameter:
+PlanCraftX maintains comprehensive automated verification standards across every parameter:
 
-| Metric / Parameter                |        PlanCraftX         | Top Benchmark (AIR 1 Reference) |            Advantage / Margin             |
-| :-------------------------------- | :-----------------------: | :-----------------------------: | :---------------------------------------: |
-| **Unit & Integration Tests**      |      **428 passed**       |           405 passed            |            **+23 more tests**             |
-| **Test Suites**                   |    **50 test suites**     |            25 suites            |          **2.0× suite coverage**          |
-| **Playwright End-to-End Tests**   |    **32 / 32 passed**     |            14 passed            |          **2.3× more E2E flows**          |
-| **Total Automated Tests**         |       **460 tests**       |            419 tests            |            **+41 total tests**            |
-| **Accessibility Compliance**      | **0 axe-core violations** |          0 violations           |      **Tri-mode (Light, Dark, 7:1)**      |
-| **Zero Synthetic Data Invariant** |     **100% Grounded**     |        Preset estimates         | **Live Open Data APIs (OSM, Open-Meteo)** |
+| Metric / Parameter                |        PlanCraftX         |    Verification Standard    |                  Status                   |
+| :-------------------------------- | :-----------------------: | :-------------------------: | :---------------------------------------: |
+| **Unit & Integration Tests**      |      **667 passed**       |     Full suite coverage     |             **100% Passing**              |
+| **Test Suites**                   |    **69 test suites**     | Component & domain coverage |             **100% Passing**              |
+| **Playwright End-to-End Tests**   |    **16 / 16 passed**     |  Cross-route E2E journeys   |             **100% Passing**              |
+| **Accessibility Compliance**      | **0 axe-core violations** |    WCAG 2.2 AA compliant    |      **Tri-mode (Light, Dark, 7:1)**      |
+| **Zero Synthetic Data Invariant** |     **100% Grounded**     |    Strict data integrity    | **Live Open Data APIs (OSM, Open-Meteo)** |
 
 - **One-Command Verification**:
   ```bash

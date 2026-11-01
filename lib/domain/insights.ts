@@ -1,4 +1,5 @@
 import type { EventPlan } from '../schemas/event-plan';
+import { formatMinorUnits } from './budget-math';
 
 export interface PlanFinding {
   readonly id: string;
@@ -15,22 +16,22 @@ function collectBudgetFindings(plan: EventPlan): PlanFinding[] {
   const currentAllocated = plan.budgetItems.reduce((acc, b) => acc + b.allocatedMinor, 0);
 
   if (currentAllocated > totalBudget) {
-    const overAmount = (currentAllocated - totalBudget) / 100;
+    const overDiff = currentAllocated - totalBudget;
     findings.push({
       id: 'budget_over',
       priority: 'urgent',
-      title: `Over Budget by ${overAmount.toFixed(2)} ${plan.currency}`,
+      title: `Over Budget by ${formatMinorUnits(overDiff, plan.currency)} ${plan.currency}`,
       details:
         'Your category allocations exceed your total budget cap. Rebalance or explore tradeoffs.',
       targetTab: 'budget',
       actionLabel: 'Rebalance Budget',
     });
   } else if (currentAllocated < totalBudget) {
-    const unallocated = (totalBudget - currentAllocated) / 100;
+    const unallocatedDiff = totalBudget - currentAllocated;
     findings.push({
       id: 'budget_unallocated',
       priority: 'suggestion',
-      title: `${unallocated.toFixed(2)} ${plan.currency} Unallocated Funds Available`,
+      title: `${formatMinorUnits(unallocatedDiff, plan.currency)} ${plan.currency} Unallocated Funds Available`,
       details:
         'You have reserve funds not yet assigned to categories. Consider boosting your contingency.',
       targetTab: 'budget',

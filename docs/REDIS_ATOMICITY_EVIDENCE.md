@@ -2,7 +2,7 @@
 
 ## 1. Lua Script Definition & Verification
 
-Location: `lib/domain/rate-limiter.ts`
+Location: `lib/security/rate-limiter.ts`
 
 ```lua
 local key = KEYS[1]

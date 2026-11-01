@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { VendorItem } from '@/lib/schemas/event-plan';
+import { formatMinorUnits } from '@/lib/domain/budget-math';
 
 interface QuoteComparisonProps {
   readonly vendors: readonly VendorItem[];
@@ -76,7 +77,7 @@ export function QuoteComparison({ vendors, currency, onAcceptQuote }: QuoteCompa
             {filtered.map((vendor) => {
               const costMajor =
                 vendor.estimatedCostMinor !== undefined
-                  ? (vendor.estimatedCostMinor / 100).toLocaleString()
+                  ? formatMinorUnits(vendor.estimatedCostMinor, currency)
                   : 'Contact for quote';
 
               return (

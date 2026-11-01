@@ -3,7 +3,7 @@ import {
   InMemoryRateLimiter,
   UpstashRedisRateLimiter,
   createRateLimiter,
-} from '@/lib/domain/rate-limiter';
+} from '@/lib/security/rate-limiter';
 
 describe('Rate Limiter Domain & Adapters', () => {
   it('enforces in-memory sliding window limits and supports clearing', async () => {

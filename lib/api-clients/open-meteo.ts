@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
 import { secureFetch } from '../security/secure-fetch';
@@ -41,24 +42,16 @@ export function interpretWeatherCode(code: number): string {
   return match ? match.description : 'Overcast';
 }
 
-function parseGeocodingResult(
-  first: Record<string, unknown> | undefined,
-  query: string,
-): Result<GeocodingResult, { code: string; message: string }> {
-  if (!first || typeof first['latitude'] !== 'number' || typeof first['longitude'] !== 'number') {
-    return err({
-      code: 'LOCATION_NOT_FOUND',
-      message: `No geographic coordinates found for "${query}".`,
-    });
-  }
+const geocodingItemSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  name: z.string().optional(),
+  country: z.string().optional(),
+});
 
-  return ok({
-    latitude: first['latitude'],
-    longitude: first['longitude'],
-    name: String(first['name'] || query),
-    country: String(first['country'] || ''),
-  });
-}
+const geocodingResponseSchema = z.object({
+  results: z.array(geocodingItemSchema).optional(),
+});
 
 /**
  * Searches coordinates for a city or region name using Open-Meteo Geocoding API.
@@ -78,8 +71,22 @@ export async function searchCoordinates(
       });
     }
 
-    const data = (await res.json()) as { results?: Array<Record<string, unknown>> };
-    return parseGeocodingResult(data.results?.[0], query);
+    const rawJson: unknown = await res.json();
+    const parsed = geocodingResponseSchema.safeParse(rawJson);
+    const first = parsed.success ? parsed.data.results?.[0] : undefined;
+    if (!first) {
+      return err({
+        code: 'LOCATION_NOT_FOUND',
+        message: `No geographic coordinates found for "${query}".`,
+      });
+    }
+
+    return ok({
+      latitude: first.latitude,
+      longitude: first.longitude,
+      name: first.name || query,
+      country: first.country || '',
+    });
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Network error';
     return err({
@@ -89,12 +96,18 @@ export async function searchCoordinates(
   }
 }
 
-interface DailyPayload {
-  weathercode?: number[];
-  temperature_2m_max?: number[];
-  temperature_2m_min?: number[];
-  precipitation_probability_max?: number[];
-}
+const dailyPayloadSchema = z.object({
+  weathercode: z.array(z.number()).optional(),
+  temperature_2m_max: z.array(z.number()).optional(),
+  temperature_2m_min: z.array(z.number()).optional(),
+  precipitation_probability_max: z.array(z.number()).optional(),
+});
+
+const forecastResponseSchema = z.object({
+  daily: dailyPayloadSchema.optional(),
+});
+
+type DailyPayload = z.infer<typeof dailyPayloadSchema>;
 
 function getFirstNumber(arr?: number[], fallback: number = 0): number {
   return arr?.[0] ?? fallback;
@@ -134,8 +147,9 @@ export async function fetchWeatherForecast(
       });
     }
 
-    const data = (await res.json()) as { daily?: DailyPayload };
-    const parsed = parseDailyWeather(data.daily);
+    const rawJson: unknown = await res.json();
+    const forecastParsed = forecastResponseSchema.safeParse(rawJson);
+    const parsed = forecastParsed.success ? parseDailyWeather(forecastParsed.data.daily) : null;
 
     if (!parsed) {
       return err({

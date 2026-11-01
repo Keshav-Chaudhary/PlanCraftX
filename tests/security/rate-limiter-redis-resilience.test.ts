@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { UpstashRedisRateLimiter, InMemoryRateLimiter } from '../../lib/domain/rate-limiter';
+import { UpstashRedisRateLimiter, InMemoryRateLimiter } from '../../lib/security/rate-limiter';
 import type { Redis } from '@upstash/redis';
 
 describe('Security: Upstash Redis Rate Limiter Resilience & Fail-Safe Mode', () => {

@@ -1,4 +1,5 @@
 import type { EventPlan, BudgetItem } from '../schemas/event-plan';
+import { formatMinorUnits } from './budget-math';
 
 export interface TradeoffOption {
   readonly id: 'reduce_guests' | 'trim_flexible' | 'use_contingency';
@@ -33,7 +34,7 @@ function buildGuestReductionOption(plan: EventPlan, overAmount: number): Tradeof
     impactMinor: potentialSavings,
     description: `Adjust guest list from ${plan.guestCount} to ${
       plan.guestCount - suggestedReduction
-    } guests to save ${potentialSavings / 100} ${plan.currency}.`,
+    } guests to save ${formatMinorUnits(potentialSavings, plan.currency)} ${plan.currency}.`,
   };
 }
 
@@ -56,9 +57,10 @@ function buildFlexibleTrimOption(plan: EventPlan, overAmount: number): TradeoffO
     id: 'trim_flexible',
     title: 'Proportionally Trim Non-Essential Categories',
     impactMinor: trimSavings,
-    description: `Proportionally scale down flexible expenses (decor, favors, entertainment) to recover ${
-      trimSavings / 100
-    } ${plan.currency}.`,
+    description: `Proportionally scale down flexible expenses (decor, favors, entertainment) to recover ${formatMinorUnits(
+      trimSavings,
+      plan.currency,
+    )} ${plan.currency}.`,
   };
 }
 
@@ -74,9 +76,10 @@ function buildContingencyOption(plan: EventPlan, overAmount: number): TradeoffOp
     id: 'use_contingency',
     title: 'Absorb with Contingency Reserve',
     impactMinor: usableContingency,
-    description: `Draw ${usableContingency / 100} ${plan.currency} from your emergency buffer (${(
-      contingency.allocatedMinor / 100
-    ).toFixed(2)} ${plan.currency} available).`,
+    description: `Draw ${formatMinorUnits(usableContingency, plan.currency)} ${plan.currency} from your emergency buffer (${formatMinorUnits(
+      contingency.allocatedMinor,
+      plan.currency,
+    )} ${plan.currency} available).`,
   };
 }
 

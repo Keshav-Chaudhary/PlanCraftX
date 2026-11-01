@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
 import { secureFetch } from '../security/secure-fetch';
@@ -5,25 +6,39 @@ import type { OsmPlace } from '../schemas/api-schemas';
 
 export type { OsmPlace };
 
-function resolvePlaceName(place: Record<string, unknown>, fallbackQuery: string): string {
-  const rawName = place['name'];
+const rawOsmItemSchema = z.object({
+  osm_id: z.union([z.string(), z.number()]),
+  name: z.string().optional(),
+  display_name: z.string(),
+  type: z.string().optional(),
+  class: z.string().optional(),
+  lat: z.string().optional(),
+  lon: z.string().optional(),
+});
+
+const osmSearchResponseSchema = z.array(rawOsmItemSchema);
+
+type RawOsmItem = z.infer<typeof rawOsmItemSchema>;
+
+function resolvePlaceName(place: RawOsmItem, fallbackQuery: string): string {
+  const rawName = place.name;
   if (typeof rawName === 'string' && rawName.trim().length > 0) {
     return rawName.trim();
   }
-  const displayName = typeof place['display_name'] === 'string' ? place['display_name'] : '';
+  const displayName = place.display_name;
   const firstSegment = displayName.split(',')[0]?.trim();
   return firstSegment || fallbackQuery;
 }
 
-function mapRawPlaceToOsmPlace(place: Record<string, unknown>, fallbackQuery: string): OsmPlace {
+function mapRawPlaceToOsmPlace(place: RawOsmItem, fallbackQuery: string): OsmPlace {
   return {
-    osmId: String(place['osm_id']),
+    osmId: String(place.osm_id),
     name: resolvePlaceName(place, fallbackQuery),
-    displayName: String(place['display_name']),
-    type: String(place['type'] || 'venue'),
-    category: String(place['class'] || 'place'),
-    latitude: parseFloat(String(place['lat'] || '0')),
-    longitude: parseFloat(String(place['lon'] || '0')),
+    displayName: place.display_name,
+    type: place.type || 'venue',
+    category: place.class || 'place',
+    latitude: parseFloat(place.lat || '0'),
+    longitude: parseFloat(place.lon || '0'),
   };
 }
 
@@ -56,15 +71,13 @@ export async function searchOsmPlaces(
       });
     }
 
-    const data = (await res.json()) as Array<Record<string, unknown>>;
-    if (!Array.isArray(data)) {
+    const rawJson: unknown = await res.json();
+    const parsed = osmSearchResponseSchema.safeParse(rawJson);
+    if (!parsed.success) {
       return ok([]);
     }
 
-    const places: OsmPlace[] = data
-      .filter((p) => typeof p['osm_id'] !== 'undefined' && typeof p['display_name'] === 'string')
-      .map((p) => mapRawPlaceToOsmPlace(p, query));
-
+    const places: OsmPlace[] = parsed.data.map((p) => mapRawPlaceToOsmPlace(p, query));
     return ok(places);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Network error';

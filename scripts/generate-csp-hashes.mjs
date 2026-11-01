@@ -58,8 +58,8 @@ if (fs.existsSync(firebaseJsonPath)) {
       let csp = cspHeader.value;
       const scriptSrcMatch = csp.match(/script-src\s+([^;]+)/);
       if (scriptSrcMatch) {
-        // Ensure 'self' and 'unsafe-inline' are kept
-        const requiredTokens = new Set(["'self'", "'unsafe-inline'", ...sortedHashes]);
+        // Strict hashes enforce script integrity without 'unsafe-inline'
+        const requiredTokens = new Set(["'self'", ...sortedHashes]);
         const newTokens = Array.from(requiredTokens).join(' ');
         csp = csp.replace(/script-src\s+[^;]+/, `script-src ${newTokens}`);
         cspHeader.value = csp;

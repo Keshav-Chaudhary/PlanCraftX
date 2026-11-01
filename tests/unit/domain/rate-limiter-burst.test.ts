@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { InMemoryRateLimiter, createRateLimiter } from '../../../lib/domain/rate-limiter';
+import { InMemoryRateLimiter, createRateLimiter } from '../../../lib/security/rate-limiter';
 
 describe('Sliding-Window Rate Limiter Deep & Concurrency Invariants', () => {
   it('defaults to 20 requests per 60,000ms window', () => {

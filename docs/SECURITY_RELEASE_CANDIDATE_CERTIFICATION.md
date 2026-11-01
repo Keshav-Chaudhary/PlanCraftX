@@ -103,7 +103,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' '
 
 ### Atomic Lua Sliding-Window Script
 
-In `lib/domain/rate-limiter.ts`, the Upstash Redis rate limiter operates via an atomic Lua script:
+In `lib/security/rate-limiter.ts`, the Upstash Redis rate limiter operates via an atomic Lua script:
 
 ```lua
 local key = KEYS[1]
@@ -215,7 +215,7 @@ All quality gates:
 | 2   | OWASP security header coverage                                 | `firebase.json` and `proxy.ts` enforce nosniff, DENY, strict-origin, COOP, CORP, Permissions-Policy, HSTS. Verified in `tests/security/headers.test.ts`.                                          |            **PASS**            |
 | 3   | Gemini API key isolation from client bundles                   | `tests/security/gemini-secret-audit.test.ts` scans all source, bundles, and `out/` for `NEXT_PUBLIC_` and key patterns; 0 matches.                                                                |            **PASS**            |
 | 4   | Safe UI fallback when `/api/*` routes are unreachable          | `EventWizard`, `WizardAiIntake`, `ChatAssistant`, `VendorQuoteAnalyzer` catch non-200/404 fetch and trigger local deterministic engines.                                                          |            **PASS**            |
-| 5   | Upstash Redis atomic Lua script execution                      | `lib/domain/rate-limiter.ts` Lua script executes `ZREMRANGEBYSCORE`, `ZCARD`, `ZADD`, `PEXPIRE` atomically. Verified in `tests/unit/domain/rate-limiter.test.ts`.                                 |            **PASS**            |
+| 5   | Upstash Redis atomic Lua script execution                      | `lib/security/rate-limiter.ts` Lua script executes `ZREMRANGEBYSCORE`, `ZCARD`, `ZADD`, `PEXPIRE` atomically. Verified in `tests/unit/domain/rate-limiter.test.ts`.                               |            **PASS**            |
 | 6   | Redis production fail-closed policy                            | In `NODE_ENV === 'production'`, Redis outages reject requests rather than bypassing limits. Verified in `tests/security/rate-limiter-redis-resilience.test.ts`.                                   |            **PASS**            |
 | 7   | Live distributed Redis concurrency across multiple nodes       | Mock & single-client verified. Remote live Upstash cluster credentials are not configured in test repo; independent remote concurrency verification is blocked.                                   |          **BLOCKED**           |
 | 8   | SSRF domain allowlisting and IP blocking                       | Outbound requests validated against strict allowlist. Loopback, metadata, and private IP ranges blocked. Verified in `tests/security/ssrf-outbound.test.ts`.                                      |            **PASS**            |

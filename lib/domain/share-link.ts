@@ -7,10 +7,12 @@ export function toBase64Url(str: string): string {
   if (typeof Buffer !== 'undefined') {
     return Buffer.from(str, 'utf-8').toString('base64url');
   }
-  return btoa(unescape(encodeURIComponent(str)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
+  const bytes = new TextEncoder().encode(str);
+  let binString = '';
+  for (const byte of bytes) {
+    binString += String.fromCharCode(byte);
+  }
+  return btoa(binString).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 export function fromBase64Url(b64: string): string {
@@ -21,7 +23,10 @@ export function fromBase64Url(b64: string): string {
   while (base64.length % 4) {
     base64 += '=';
   }
-  return decodeURIComponent(escape(atob(base64)));
+  const binString = atob(base64);
+  const codePoints = Array.from(binString, (c) => c.charCodeAt(0));
+  const bytes = new Uint8Array(codePoints);
+  return new TextDecoder().decode(bytes);
 }
 
 /**

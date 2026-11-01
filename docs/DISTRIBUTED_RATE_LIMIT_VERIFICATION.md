@@ -13,7 +13,7 @@ In distributed multi-instance environments (serverless runtimes, multi-pod Kuber
 
 ### 2.1 Atomic Redis Lua Script
 
-`UpstashRedisRateLimiter` (`lib/domain/rate-limiter.ts`) executes an atomic Redis Lua script via `redis.eval(...)`:
+`UpstashRedisRateLimiter` (`lib/security/rate-limiter.ts`) executes an atomic Redis Lua script via `redis.eval(...)`:
 
 ```lua
 local key = KEYS[1]

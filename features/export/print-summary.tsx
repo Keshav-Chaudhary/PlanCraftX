@@ -1,6 +1,7 @@
 'use client';
 
 import type { EventPlan } from '@/lib/schemas/event-plan';
+import { formatMinorUnits } from '@/lib/domain/budget-math';
 
 interface PrintSummaryProps {
   readonly plan: EventPlan;
@@ -13,7 +14,7 @@ export function PrintSummary({ plan }: PrintSummaryProps) {
     }
   };
 
-  const totalMajor = (plan.totalBudgetMinor / 100).toLocaleString();
+  const totalMajor = formatMinorUnits(plan.totalBudgetMinor, plan.currency);
 
   return (
     <div className="border-border/80 bg-surface/40 my-6 rounded-xl border p-5 shadow-sm print:border-none print:p-0 print:shadow-none">
@@ -60,7 +61,7 @@ export function PrintSummary({ plan }: PrintSummaryProps) {
               <div key={item.id} className="border-border/40 bg-surface/50 rounded border p-2">
                 <div className="text-muted truncate">{item.category}</div>
                 <div className="font-mono font-semibold">
-                  {(item.allocatedMinor / 100).toLocaleString()} {plan.currency}
+                  {formatMinorUnits(item.allocatedMinor, plan.currency)} {plan.currency}
                 </div>
               </div>
             ))}

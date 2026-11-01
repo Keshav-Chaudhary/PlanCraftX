@@ -5,6 +5,7 @@
  */
 
 import type { PlanGenerationRequest, IdeasRequest, ChatRequest } from '../schemas/api-schemas';
+import { formatMinorUnits } from '../domain/budget-math';
 
 /**
  * Sanitizes untrusted user inputs before prompt interpolation.
@@ -159,13 +160,14 @@ export function buildQuoteExtractPrompt(
   quoteText: string,
   category: string,
   categoryBudgetMinor: number,
+  currency = 'USD',
 ): string {
   return `${SYSTEM_SAFETY_PREAMBLE}
 
 TASK:
 Extract vendor proposal details from the provided raw quotation text.
 Category: ${category}
-Allocated Category Budget: ${(categoryBudgetMinor / 100).toFixed(2)}
+Allocated Category Budget: ${formatMinorUnits(categoryBudgetMinor, currency)} ${currency}
 
 Analyze:
 1. Vendor name if stated (null if unknown)
@@ -206,8 +208,8 @@ export function buildExplainTradeoffsPrompt(
 TASK:
 Explain these three budget recovery options in clear, reassuring, and non-judgmental language.
 Event: ${title}
-Total Budget: ${(totalMinor / 100).toFixed(2)} ${currency}
-Current Allocations: ${(allocatedMinor / 100).toFixed(2)} ${currency} (Over by ${((allocatedMinor - totalMinor) / 100).toFixed(2)} ${currency})
+Total Budget: ${formatMinorUnits(totalMinor, currency)} ${currency}
+Current Allocations: ${formatMinorUnits(allocatedMinor, currency)} ${currency} (Over by ${formatMinorUnits(allocatedMinor - totalMinor, currency)} ${currency})
 
 Options:
 ${options.map((o) => `- [${o.id}] ${o.title}: ${o.description}`).join('\n')}

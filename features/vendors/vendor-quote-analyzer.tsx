@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { EventPlan, VendorItem } from '@/lib/schemas/event-plan';
 import { quoteExtractResponseSchema, type QuoteExtractResponse } from '@/lib/schemas/api-schemas';
+import { formatMinorUnits } from '@/lib/domain/budget-math';
 import { VendorQuoteForm } from './vendor-quote-form';
 
 interface VendorQuoteAnalyzerProps {
@@ -21,7 +22,7 @@ function createQuotedVendor(
     name: result.vendorName || `${category} Quotation`,
     status: 'quoted',
     estimatedCostMinor: result.totalPriceMinor || undefined,
-    contactInfo: `Quoted: ${result.totalPriceMinor ? `${(result.totalPriceMinor / 100).toFixed(2)} ${currency}` : 'Rate per agreement'}`,
+    contactInfo: `Quoted: ${result.totalPriceMinor ? `${formatMinorUnits(result.totalPriceMinor, currency)} ${currency}` : 'Rate per agreement'}`,
     notes: `Advance: ${result.advancePercent ?? 0} pct. Cancellation: ${result.cancellationPolicy ?? 'Unstated'}. Tax: ${result.taxIncluded ? 'Included' : 'Extra'}.`,
     isEstimate: false,
   };

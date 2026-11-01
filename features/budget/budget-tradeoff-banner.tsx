@@ -7,6 +7,7 @@ import {
   applyTradeoffOption,
   type TradeoffOption,
 } from '@/lib/domain/tradeoffs';
+import { formatMinorUnits } from '@/lib/domain/budget-math';
 import {
   explainTradeoffsResponseSchema,
   type ExplainTradeoffsResponse,
@@ -78,7 +79,7 @@ export function BudgetTradeoffBanner({ plan, onPlanUpdate }: BudgetTradeoffBanne
         <div>
           <h3 className="text-danger flex items-center space-x-2 text-base font-bold">
             <span>
-              ⚠️ Over Budget by {(overAmount / 100).toFixed(2)} {plan.currency}
+              ⚠️ Over Budget by {formatMinorUnits(overAmount, plan.currency)} {plan.currency}
             </span>
           </h3>
           <p className="text-muted text-xs">

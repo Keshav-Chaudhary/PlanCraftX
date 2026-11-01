@@ -2,6 +2,7 @@
 
 import type { EventPlan } from '@/lib/schemas/event-plan';
 import type { QuoteExtractResponse } from '@/lib/schemas/api-schemas';
+import { formatMinorUnits } from '@/lib/domain/budget-math';
 import { VendorQuoteResultCard } from './vendor-quote-result-card';
 
 interface VendorQuoteFormProps {
@@ -46,7 +47,8 @@ export function VendorQuoteForm({
           >
             {plan.budgetItems.map((b) => (
               <option key={b.category} value={b.category}>
-                {b.category} (Allocation: {(b.allocatedMinor / 100).toFixed(2)} {plan.currency})
+                {b.category} (Allocation: {formatMinorUnits(b.allocatedMinor, plan.currency)}{' '}
+                {plan.currency})
               </option>
             ))}
           </select>

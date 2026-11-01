@@ -1,7 +1,16 @@
+import { z } from 'zod';
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
 import type { PublicHoliday } from '../schemas/api-schemas';
 import { secureFetch } from '../security/secure-fetch';
+
+const nagerHolidayItemSchema = z.object({
+  date: z.string(),
+  name: z.string().optional(),
+  localName: z.string().optional(),
+});
+
+const nagerHolidaysSchema = z.array(nagerHolidayItemSchema);
 
 export async function fetchPublicHolidays(
   year: number,
@@ -19,17 +28,16 @@ export async function fetchPublicHolidays(
       });
     }
 
-    const data = (await res.json()) as Array<{ date?: string; name?: string; localName?: string }>;
-    if (!Array.isArray(data)) {
+    const rawJson: unknown = await res.json();
+    const parsed = nagerHolidaysSchema.safeParse(rawJson);
+    if (!parsed.success) {
       return ok([]);
     }
 
-    const holidays: PublicHoliday[] = data
-      .filter((h) => typeof h.date === 'string' && typeof h.name === 'string')
-      .map((h) => ({
-        date: h.date as string,
-        name: (h.name as string) || (h.localName as string) || 'Public Holiday',
-      }));
+    const holidays: PublicHoliday[] = parsed.data.map((h) => ({
+      date: h.date,
+      name: h.name || h.localName || 'Public Holiday',
+    }));
 
     return ok(holidays);
   } catch (error: unknown) {
