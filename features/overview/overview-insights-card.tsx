@@ -2,9 +2,18 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import {
+  Compass,
+  Sparkles,
+  ArrowRight,
+  AlertTriangle,
+  AlertCircle,
+  CheckCircle2,
+} from 'lucide-react';
 import type { EventPlan } from '@/lib/schemas/event-plan';
 import { generatePlanFindings, type PlanFinding } from '@/lib/domain/insights';
 import { planReviewResponseSchema, type PlanReviewResponse } from '@/lib/schemas/api-schemas';
+import { Badge } from '@/features/ui/badge';
 
 interface OverviewInsightsCardProps {
   readonly plan: EventPlan;
@@ -55,36 +64,41 @@ export function OverviewInsightsCard({ plan }: OverviewInsightsCardProps) {
     switch (priority) {
       case 'urgent':
         return (
-          <span className="bg-danger/10 text-danger rounded px-2 py-0.5 text-[11px] font-bold uppercase">
-            Urgent
-          </span>
+          <Badge tone="critical" className="text-[10px] font-bold tracking-wider uppercase">
+            <AlertCircle className="size-3" /> Urgent
+          </Badge>
         );
       case 'warning':
         return (
-          <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-600 uppercase dark:text-amber-400">
-            Needs Attention
-          </span>
+          <Badge tone="caution" className="text-[10px] font-bold tracking-wider uppercase">
+            <AlertTriangle className="size-3" /> Needs Attention
+          </Badge>
         );
       case 'suggestion':
         return (
-          <span className="bg-primary/10 text-primary rounded px-2 py-0.5 text-[11px] font-bold uppercase">
-            Suggestion
-          </span>
+          <Badge tone="accent" className="text-[10px] font-bold tracking-wider uppercase">
+            <CheckCircle2 className="size-3" /> Suggestion
+          </Badge>
         );
     }
   };
 
   return (
-    <div className="border-border bg-surface rounded-xl border p-6 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
-        <div>
-          <h3 className="text-foreground text-base font-bold">
-            🧭 Plan Health & Priority Action Items
-          </h3>
-          <p className="text-muted text-xs">
-            Deterministic ranking of what needs your immediate attention across budget, timeline,
-            and vendors.
-          </p>
+    <div className="bg-surface-2/80 rounded-2xl border border-[var(--border)] p-6 shadow-[var(--shadow-sm)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] pb-4">
+        <div className="flex items-center gap-3">
+          <span className="bg-surface-3 text-accent flex size-9 items-center justify-center rounded-xl border border-[var(--border)] shadow-inner">
+            <Compass className="size-5" />
+          </span>
+          <div>
+            <h3 className="text-fg text-base font-bold tracking-tight">
+              Plan Health & Priority Action Items
+            </h3>
+            <p className="text-fg-muted text-xs leading-relaxed">
+              Deterministic ranking of what needs your immediate attention across budget, timeline,
+              and vendors.
+            </p>
+          </div>
         </div>
 
         <button
@@ -92,24 +106,27 @@ export function OverviewInsightsCard({ plan }: OverviewInsightsCardProps) {
           id="ai-plan-review-btn"
           disabled={loadingAi}
           onClick={handleReviewWithAi}
-          className="border-border bg-surface-elevated text-foreground rounded-lg border px-3 py-1.5 text-xs font-semibold shadow-sm hover:opacity-90 disabled:opacity-50"
+          className="bg-surface-3 text-fg hover:text-accent flex cursor-pointer items-center gap-1.5 rounded-full border border-[var(--border-strong)] px-4 py-2 text-xs font-bold shadow-xs transition-all hover:border-[var(--accent-line)] disabled:opacity-50"
         >
-          {loadingAi ? 'AI Generating Review...' : '✨ Ask AI for Plan Review'}
+          <Sparkles className="text-accent size-3.5" />
+          <span>{loadingAi ? 'AI Generating Review...' : 'Ask AI for Plan Review'}</span>
         </button>
       </div>
 
       {errorMsg && (
-        <p className="text-danger mt-3 text-xs" role="alert">
+        <p className="text-critical mt-3 text-xs font-semibold" role="alert">
           {errorMsg}
         </p>
       )}
 
       {aiReview && (
-        <div className="border-border bg-surface-elevated/50 mt-4 space-y-2 rounded-xl border p-4 text-xs">
-          <p className="text-foreground leading-relaxed font-medium italic">{aiReview.summary}</p>
-          <div className="mt-2 space-y-1">
-            <span className="text-foreground font-semibold">Prioritized Next Steps:</span>
-            <ul className="text-muted list-disc space-y-0.5 pl-5">
+        <div className="border-accent-line bg-accent-subtle/30 mt-4 space-y-2 rounded-2xl border p-4 text-xs">
+          <p className="text-fg leading-relaxed font-semibold italic">{aiReview.summary}</p>
+          <div className="mt-3 space-y-1.5">
+            <span className="text-fg text-[10px] font-bold tracking-wider uppercase">
+              Prioritized Next Steps:
+            </span>
+            <ul className="text-fg-muted list-disc space-y-1 pl-5">
               {aiReview.actionSteps.map((step, idx) => (
                 <li key={idx}>{step}</li>
               ))}
@@ -122,22 +139,23 @@ export function OverviewInsightsCard({ plan }: OverviewInsightsCardProps) {
         {findings.map((finding) => (
           <div
             key={finding.id}
-            className="border-border bg-surface-elevated/30 flex flex-col justify-between rounded-lg border p-3.5 sm:flex-row sm:items-center"
+            className="bg-surface-3/50 hover:bg-surface-3 flex flex-col justify-between gap-3 rounded-xl border border-[var(--border)] p-4 transition-all sm:flex-row sm:items-center"
           >
             <div className="space-y-1">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 {getPriorityBadge(finding.priority)}
-                <strong className="text-foreground text-sm">{finding.title}</strong>
+                <strong className="text-fg text-sm font-bold">{finding.title}</strong>
               </div>
-              <p className="text-muted text-xs">{finding.details}</p>
+              <p className="text-fg-muted text-xs leading-relaxed">{finding.details}</p>
             </div>
 
-            <div className="mt-3 sm:mt-0">
+            <div className="shrink-0">
               <Link
                 href={`/plan/${finding.targetTab}`}
-                className="bg-primary text-primary-fg inline-block rounded-md px-3 py-1.5 text-xs font-semibold transition-opacity hover:opacity-90"
+                className="group/btn bg-surface text-fg hover:bg-surface-2 hover:text-accent inline-flex cursor-pointer items-center gap-1 rounded-full border border-[var(--border-strong)] px-3.5 py-1.5 text-xs font-bold transition-all hover:border-[var(--accent-line)]"
               >
-                {finding.actionLabel} &rarr;
+                <span>{finding.actionLabel}</span>
+                <ArrowRight className="size-3 transition-transform group-hover/btn:translate-x-0.5" />
               </Link>
             </div>
           </div>

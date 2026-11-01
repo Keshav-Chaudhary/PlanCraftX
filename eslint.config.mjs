@@ -15,6 +15,7 @@ export default tseslint.config(
       'playwright-report/**',
       'test-results/**',
       'reports/**',
+      'PromptWars_Challenge1_Exclusive/**',
       'next-env.d.ts',
       '**/*.d.ts',
     ],

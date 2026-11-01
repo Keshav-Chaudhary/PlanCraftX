@@ -5,7 +5,12 @@
     "scripts/**/*.{js,mjs,ts}",
     "tests/**/*.{ts,tsx}"
   ],
-  "project": ["app/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}", "scripts/**/*.{js,mjs,ts}"],
+  "project": [
+    "app/**/*.{ts,tsx}",
+    "features/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}",
+    "scripts/**/*.{js,mjs,ts}"
+  ],
   "ignoreDependencies": [
     "@testing-library/user-event",
     "eslint-config-next",

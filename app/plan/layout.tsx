@@ -1,10 +1,28 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { PlanProvider, usePlan } from '@/features/plan-context';
-import { WorkspaceNavigation } from '@/features/workspace-navigation';
+import { WorkspaceSidebar } from '@/features/workspace/workspace-sidebar';
+import { WorkspaceMobileHeader } from '@/features/workspace/workspace-mobile-header';
+import { WorkspaceLiveStatusHeader } from '@/features/workspace/workspace-live-status-header';
+import { WorkspaceMobileNav } from '@/features/workspace/workspace-mobile-nav';
+import { SettingsModal } from '@/features/workspace/settings-modal';
 
 function WorkspaceShell({ children }: { readonly children: React.ReactNode }) {
-  const { isLoaded, storageError, clearStorageError } = usePlan();
+  const { isLoaded, storageError, clearStorageError, plan } = usePlan();
+  const pathname = usePathname();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#settings') {
+      setIsSettingsOpen(true);
+    }
+
+    const handleOpen = () => setIsSettingsOpen(true);
+    window.addEventListener('open-workspace-settings', handleOpen);
+    return () => window.removeEventListener('open-workspace-settings', handleOpen);
+  }, []);
 
   if (!isLoaded) {
     return (
@@ -20,29 +38,55 @@ function WorkspaceShell({ children }: { readonly children: React.ReactNode }) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      {storageError && (
+    <div className="bg-bg text-fg relative flex min-h-screen flex-col md:flex-row">
+      {/* Desktop Left Sidebar Navigation with Animated Hover Expand */}
+      <WorkspaceSidebar
+        plan={plan}
+        currentPath={pathname}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
+
+      {/* Mobile Top Header */}
+      <WorkspaceMobileHeader plan={plan} />
+
+      {/* Main Content Area */}
+      <div className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Live Telemetry Status Header */}
+        <WorkspaceLiveStatusHeader plan={plan} onOpenSettings={() => setIsSettingsOpen(true)} />
+
+        {/* Scrollable Tab Content Container */}
         <div
-          role="alert"
-          aria-live="polite"
-          className="border-warning/30 bg-warning/10 text-warning flex items-center justify-between rounded-xl border p-4 text-xs font-medium"
+          id="main-tab-content"
+          className="custom-scrollbar flex-1 space-y-6 overflow-y-auto p-4 pb-24 md:p-6 md:pb-12 lg:p-8"
         >
-          <span>⚠️ {storageError}</span>
-          <button
-            type="button"
-            onClick={clearStorageError}
-            className="font-semibold hover:underline"
-          >
-            Dismiss
-          </button>
+          {storageError && (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="border-warning/30 bg-warning/10 text-warning flex items-center justify-between rounded-xl border p-4 text-xs font-medium"
+            >
+              <span>⚠️ {storageError}</span>
+              <button
+                type="button"
+                onClick={clearStorageError}
+                className="font-semibold hover:underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          <div className="animate-in fade-in mx-auto w-full max-w-7xl space-y-6 duration-300">
+            {children}
+          </div>
         </div>
-      )}
+      </div>
 
-      <WorkspaceNavigation />
+      {/* Mobile Bottom Navigation */}
+      <WorkspaceMobileNav plan={plan} currentPath={pathname} />
 
-      <section aria-label="Workspace View" className="pt-2">
-        {children}
-      </section>
+      {/* Settings Modal Overlay matching ClauseIQX */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }

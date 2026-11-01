@@ -1,6 +1,8 @@
 'use client';
 
 import type { EventPlan } from '@/lib/schemas/event-plan';
+import { Target, CheckCircle2, Calendar, ClipboardList } from 'lucide-react';
+import { ProgressRing } from '@/features/ui/progress-ring';
 
 interface PlanReadinessBarProps {
   readonly plan: EventPlan;
@@ -38,33 +40,52 @@ export function PlanReadinessBar({ plan }: PlanReadinessBarProps) {
   const readiness = calculateReadiness(plan);
 
   let statusBadge = 'Initial Setup';
-  let badgeColor = 'bg-amber-500/10 text-amber-600 border-amber-500/20';
+  let badgeTone = 'border-caution/30 bg-caution-subtle text-caution';
+  let ringTone: 'positive' | 'accent' | 'caution' = 'caution';
 
   if (readiness >= 80) {
     statusBadge = 'High Confidence · Ready for Execution';
-    badgeColor = 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
+    badgeTone = 'border-positive/30 bg-positive-subtle text-positive';
+    ringTone = 'positive';
   } else if (readiness >= 50) {
     statusBadge = 'In Progress · Key Milestones Pending';
-    badgeColor = 'bg-blue-500/10 text-blue-600 border-blue-500/20';
+    badgeTone = 'border-accent-line bg-accent-subtle text-accent';
+    ringTone = 'accent';
   }
 
   return (
     <section
       aria-label="Overall Plan Readiness Index"
-      className="border-border/70 bg-surface/50 my-5 rounded-xl border p-4 shadow-sm"
+      className="bg-surface-2/70 my-5 rounded-2xl border border-[var(--border)] p-5 shadow-[var(--shadow-sm)]"
     >
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-lg" aria-hidden="true">
-            🎯
-          </span>
-          <h3 className="text-foreground text-sm font-semibold">Plan Readiness Index</h3>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <ProgressRing
+            value={readiness}
+            size={48}
+            strokeWidth={5}
+            tone={ringTone}
+            ariaLabel="Plan readiness ring gauge"
+          />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="bg-surface-3 text-accent flex size-6 items-center justify-center rounded-md border border-[var(--border)]">
+                <Target className="size-3.5" />
+              </span>
+              <h3 className="text-fg text-sm font-bold tracking-tight">Plan Readiness Index</h3>
+            </div>
+            <p className="text-fg-muted mt-0.5 text-xs">
+              Multi-factor health score calculated from budget, milestones, and vendor
+              confirmations.
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${badgeColor}`}>
+
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <span className={`rounded-full border px-3 py-0.5 text-xs font-bold ${badgeTone}`}>
             {statusBadge}
           </span>
-          <span className="text-foreground font-mono text-sm font-bold">{readiness}/100</span>
+          <span className="text-fg font-mono text-base font-black">{readiness}/100</span>
         </div>
       </div>
 
@@ -74,18 +95,27 @@ export function PlanReadinessBar({ plan }: PlanReadinessBarProps) {
         aria-valuenow={readiness}
         aria-valuemin={0}
         aria-valuemax={100}
-        className="bg-border/40 h-2.5 w-full overflow-hidden rounded-full"
+        className="bg-surface-3 mt-4 h-2 w-full overflow-hidden rounded-full border border-[var(--border-strong)]/40"
       >
         <div
           style={{ width: `${readiness}%` }}
-          className="bg-accent h-full rounded-full transition-all duration-500"
+          className="bg-accent h-full rounded-full shadow-[0_0_8px_var(--accent-line)] transition-all duration-700 ease-out"
         />
       </div>
 
-      <div className="text-muted mt-3 flex items-center justify-between text-[11px]">
-        <span>Budget Aligned: {plan.totalBudgetMinor > 0 ? '✓' : '—'}</span>
-        <span>Milestones: {plan.timelineItems.length} scheduled</span>
-        <span>Vendors: {plan.vendorItems.length} tracked</span>
+      <div className="text-fg-muted mt-3.5 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+        <span className="flex items-center gap-1.5">
+          <CheckCircle2 className="text-positive size-3.5" />
+          Budget Aligned: {plan.totalBudgetMinor > 0 ? '✓' : '—'}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Calendar className="text-accent size-3.5" />
+          Milestones: {plan.timelineItems.length} scheduled
+        </span>
+        <span className="flex items-center gap-1.5">
+          <ClipboardList className="text-caution size-3.5" />
+          Vendors: {plan.vendorItems.length} tracked
+        </span>
       </div>
     </section>
   );

@@ -21,6 +21,7 @@ const IGNORED_DIRS = new Set([
   'playwright-report',
   'test-results',
   'reports',
+  'PromptWars_Challenge1_Exclusive',
 ]);
 
 function isTestOrDocFile(filePath) {

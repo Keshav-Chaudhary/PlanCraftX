@@ -35,7 +35,7 @@ export default function PrivacySettingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="mx-auto max-w-4xl space-y-8 px-4 pt-28 pb-16 sm:px-6">
       <PageHeader
         title="Privacy Policy & Data Ownership"
         description="PlanCraftX is architected with a strict privacy-first and zero-tracking model. You own all of your planning data."

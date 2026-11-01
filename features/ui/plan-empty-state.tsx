@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { Sparkles, ArrowRight, Upload, Heart, Cake, Users } from 'lucide-react';
 
 export interface PlanEmptyStateProps {
   readonly title?: string;
@@ -20,53 +21,68 @@ export function PlanEmptyState({
     <div
       role="region"
       aria-labelledby="empty-plan-heading"
-      className="border-border bg-surface mx-auto max-w-2xl rounded-2xl border p-8 text-center shadow-sm sm:p-12"
+      className="bg-surface-2/80 custom-rise relative mx-auto max-w-2xl overflow-hidden rounded-3xl border border-[var(--border)] p-8 text-center shadow-[var(--shadow-md)] backdrop-blur-xl sm:p-12"
     >
       <div
-        className="bg-surface-elevated mx-auto flex h-16 w-16 items-center justify-center rounded-2xl text-3xl"
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 right-1/2 -z-10 h-48 w-48 translate-x-1/2 rounded-full bg-[var(--accent-subtle)] blur-[80px]"
+      />
+
+      <div
+        className="bg-accent-subtle text-accent mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--accent-line)] shadow-xs"
         aria-hidden="true"
       >
-        ✨
+        <Sparkles className="size-8" />
       </div>
+
       <h2
         id="empty-plan-heading"
-        className="text-foreground mt-4 text-2xl font-bold tracking-tight"
+        className="text-fg mt-6 text-2xl font-black tracking-tight sm:text-3xl"
       >
         {title}
       </h2>
-      <p className="text-muted mx-auto mt-2 max-w-lg text-sm leading-relaxed sm:text-base">
+
+      <p className="text-fg-muted mx-auto mt-3 max-w-lg text-sm leading-relaxed sm:text-base">
         {description}
       </p>
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           href={actionHref}
-          className="bg-primary text-primary-fg inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2"
+          className="group inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-[var(--accent)] px-8 text-sm font-bold text-[var(--accent-fg)] shadow-[var(--shadow-sm)] transition-all hover:-translate-y-0.5 hover:bg-[var(--accent-strong)] hover:shadow-[0_0_20px_var(--accent-line)]"
           id="empty-state-create-btn"
         >
-          {actionLabel}
+          <span>{actionLabel}</span>
+          <ArrowRight
+            aria-hidden="true"
+            className="size-4 transition-transform group-hover:translate-x-1"
+          />
         </Link>
         <Link
           href="/plan/export"
-          className="border-border bg-surface hover:bg-surface-elevated text-foreground inline-flex items-center justify-center rounded-lg border px-5 py-3 text-sm font-medium transition-colors"
+          className="bg-surface-3 text-fg hover:bg-surface inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-[var(--border-strong)] px-6 text-sm font-semibold transition-colors hover:border-[var(--accent-line)]"
         >
-          Import JSON Backup
+          <Upload className="text-fg-muted size-4" />
+          <span>Import JSON Backup</span>
         </Link>
       </div>
 
-      <div className="border-border mt-8 border-t pt-6">
-        <span className="text-muted block text-xs font-semibold tracking-wider uppercase">
+      <div className="mt-10 border-t border-[var(--border)] pt-6">
+        <span className="text-fg-muted block text-xs font-bold tracking-widest uppercase">
           Supported Event Types
         </span>
-        <div className="mt-3 grid grid-cols-1 gap-2 text-xs sm:grid-cols-3">
-          <span className="bg-surface-elevated text-foreground rounded-lg p-2 font-medium">
-            💍 Weddings
+        <div className="mt-4 grid grid-cols-1 gap-2.5 text-xs sm:grid-cols-3">
+          <span className="bg-surface-3 text-fg flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] p-3 font-semibold">
+            <Heart className="text-accent size-4" />
+            <span>Weddings</span>
           </span>
-          <span className="bg-surface-elevated text-foreground rounded-lg p-2 font-medium">
-            🎂 Milestone Birthdays
+          <span className="bg-surface-3 text-fg flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] p-3 font-semibold">
+            <Cake className="text-caution size-4" />
+            <span>Milestone Birthdays</span>
           </span>
-          <span className="bg-surface-elevated text-foreground rounded-lg p-2 font-medium">
-            🤝 Community Events
+          <span className="bg-surface-3 text-fg flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] p-3 font-semibold">
+            <Users className="text-positive size-4" />
+            <span>Community Events</span>
           </span>
         </div>
       </div>

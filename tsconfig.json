@@ -35,5 +35,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "tests", "scripts"]
+  "exclude": ["node_modules", "tests", "scripts", "PromptWars_Challenge1_Exclusive"]
 }

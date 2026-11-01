@@ -36,4 +36,15 @@ describe('ThemeToggle Component', () => {
     expect(darkBtn.getAttribute('aria-pressed')).toBe('true');
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
   });
+
+  it('renders switch variant and toggles between dark and light', () => {
+    localStorage.setItem('PlanCraftX_theme', 'dark');
+    render(<ThemeToggle variant="switch" />);
+
+    const switchBtn = screen.getByRole('button', { name: /Switch to light theme/i });
+    expect(switchBtn).toBeDefined();
+    fireEvent.click(switchBtn);
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    expect(localStorage.getItem('PlanCraftX_theme')).toBe('light');
+  });
 });

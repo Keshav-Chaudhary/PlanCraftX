@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Sparkles, ArrowRight } from 'lucide-react';
 import type { EventTypeEnum } from '@/lib/schemas/event-plan';
 import { intakeResponseSchema } from '@/lib/schemas/api-schemas';
 
@@ -69,22 +70,27 @@ export function WizardAiIntake({ onExtracted }: WizardAiIntakeProps) {
   };
 
   return (
-    <div className="border-border bg-surface-elevated/40 mb-6 rounded-xl border p-4 text-sm">
+    <div className="bg-surface-2/60 mb-6 rounded-2xl border border-[var(--border)] p-4 text-sm transition-all hover:border-[var(--accent-line)]">
       <div className="flex items-center justify-between">
-        <span className="text-foreground font-semibold">💡 Have a description in mind?</span>
+        <div className="flex items-center gap-2">
+          <span className="bg-accent-subtle text-accent flex size-7 items-center justify-center rounded-lg border border-[var(--accent-line)]">
+            <Sparkles className="size-3.5" />
+          </span>
+          <span className="text-fg text-xs font-bold sm:text-sm">Have a description in mind?</span>
+        </div>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           id="toggle-ai-intake-btn"
-          className="text-primary hover:text-primary/80 text-xs font-semibold underline"
+          className="text-accent hover:text-accent-strong cursor-pointer text-xs font-bold transition-colors"
         >
-          {isOpen ? 'Close Natural Language Intake' : 'Describe in Natural Language'}
+          {isOpen ? 'Close Natural Language Intake' : 'Describe in Natural Language →'}
         </button>
       </div>
 
       {isOpen && (
-        <div className="mt-3 space-y-3">
-          <p className="text-muted text-xs">
+        <div className="mt-4 space-y-3 border-t border-[var(--border)] pt-3">
+          <p className="text-fg-muted text-xs leading-relaxed">
             Type or paste your requirements naturally (e.g. &ldquo;Shaadi in Pune, 200 guests, ₹8
             lakh budget, mid-Feb, simple ceremony with premium food&rdquo;).
           </p>
@@ -94,11 +100,11 @@ export function WizardAiIntake({ onExtracted }: WizardAiIntakeProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Type your event description here..."
-            className="border-border bg-surface text-foreground w-full rounded-lg border p-2.5 text-xs focus:ring-2"
+            className="bg-surface text-fg focus:border-accent w-full rounded-xl border border-[var(--border-strong)] p-3 text-xs transition-colors focus:outline-none"
           />
 
           {errorMsg && (
-            <p className="text-danger text-xs" role="alert">
+            <p className="text-critical text-xs font-semibold" role="alert">
               {errorMsg}
             </p>
           )}
@@ -109,9 +115,10 @@ export function WizardAiIntake({ onExtracted }: WizardAiIntakeProps) {
               id="fill-from-description-btn"
               disabled={loading || description.trim().length < 5}
               onClick={handleParse}
-              className="bg-primary text-primary-fg rounded-lg px-4 py-2 text-xs font-semibold hover:opacity-90 disabled:opacity-50"
+              className="bg-accent text-accent-fg inline-flex cursor-pointer items-center gap-1.5 rounded-full px-5 py-2 text-xs font-bold shadow-xs transition-all hover:bg-[var(--accent-strong)] disabled:opacity-50"
             >
-              {loading ? 'AI Parsing Description...' : 'Fill Form from Description'}
+              <span>{loading ? 'AI Parsing Description...' : 'Fill Form from Description'}</span>
+              <ArrowRight className="size-3" />
             </button>
           </div>
         </div>

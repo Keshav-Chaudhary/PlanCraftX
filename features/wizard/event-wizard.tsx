@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Sparkles, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import type { EventPlan, EventTypeEnum } from '@/lib/schemas/event-plan';
 import { eventPlanSchema } from '@/lib/schemas/event-plan';
 import { buildEventPlan, type PlanGenerationInput } from '@/lib/domain/plan-generator';
@@ -89,14 +90,22 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
   };
 
   return (
-    <div className="border-border bg-surface mx-auto max-w-3xl rounded-xl border p-6 shadow-sm sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-foreground text-2xl font-bold">
+    <div className="bg-surface-2/90 custom-rise mx-auto max-w-3xl rounded-3xl border border-[var(--border)] p-6 shadow-[var(--shadow-md)] backdrop-blur-xl sm:p-10">
+      <div className="mb-8">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="bg-accent-subtle text-accent flex size-7 items-center justify-center rounded-lg border border-[var(--accent-line)]">
+            <Sparkles className="size-3.5" />
+          </span>
+          <span className="text-accent text-xs font-bold tracking-widest uppercase">
+            Plan Initialization Wizard
+          </span>
+        </div>
+        <h2 className="text-fg text-2xl font-black tracking-tight sm:text-3xl">
           {isInitialSetup ? 'Create Your Event Plan' : 'Configure New Event Plan'}
         </h2>
-        <p className="text-muted mt-1 text-sm">
-          Select an event type and parameters to generate tailored integer-normalized budgets,
-          reverse-planned milestones, and vendor checklists.
+        <p className="text-fg-muted mt-2 text-sm leading-relaxed">
+          Select an occasion archetype and parameters to generate tailored integer-normalized
+          budgets, reverse-planned milestones, and vendor checklists.
         </p>
       </div>
 
@@ -104,9 +113,9 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
         <div
           role="alert"
           aria-live="assertive"
-          className="border-danger/30 bg-danger/10 text-danger mb-6 rounded-lg border p-4 text-sm"
+          className="border-critical/40 bg-critical-subtle/30 text-critical mb-6 rounded-2xl border p-4 text-sm font-semibold"
         >
-          <strong className="font-semibold">Planning Error: </strong>
+          <strong>Planning Error: </strong>
           {errorMessage}
         </div>
       )}
@@ -131,7 +140,11 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
         {/* Date & Location */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="event-date" className="text-foreground block text-sm font-semibold">
+            <label
+              htmlFor="event-date"
+              className="text-fg block flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase"
+            >
+              <Calendar className="text-accent size-3.5" />
               Event Date
             </label>
             <input
@@ -140,12 +153,16 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
               required
               value={eventDate}
               onChange={(e) => setEventDate(e.target.value)}
-              className="border-border bg-surface text-foreground mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:ring-2"
+              className="bg-surface text-fg focus:border-accent mt-1.5 block w-full rounded-xl border border-[var(--border-strong)] px-3.5 py-2.5 text-sm transition-colors focus:outline-none"
             />
           </div>
 
           <div>
-            <label htmlFor="event-location" className="text-foreground block text-sm font-semibold">
+            <label
+              htmlFor="event-location"
+              className="text-fg block flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase"
+            >
+              <MapPin className="text-accent size-3.5" />
               City / Location
             </label>
             <input
@@ -155,7 +172,7 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
               placeholder="e.g. Chicago, IL or London, UK"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="border-border bg-surface text-foreground mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:ring-2"
+              className="bg-surface text-fg focus:border-accent mt-1.5 block w-full rounded-xl border border-[var(--border-strong)] px-3.5 py-2.5 text-sm transition-colors focus:outline-none"
             />
           </div>
         </div>
@@ -188,7 +205,7 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
             type="submit"
             disabled={loading}
             id="generate-plan-submit-btn"
-            className="bg-primary text-primary-fg focus-visible:ring-primary flex w-full items-center justify-center rounded-lg px-6 py-3.5 text-base font-semibold shadow-sm transition-opacity hover:opacity-95 disabled:opacity-50"
+            className="group flex h-12 w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-[var(--accent)] px-8 text-base font-bold text-[var(--accent-fg)] shadow-[0_0_20px_var(--accent-line)] transition-all hover:bg-[var(--accent-strong)] hover:shadow-[0_0_30px_var(--accent-line)] disabled:opacity-50 sm:h-14"
           >
             {loading ? (
               <span className="flex items-center space-x-2">
@@ -196,7 +213,10 @@ export function EventWizard({ onPlanCreated, isInitialSetup = false }: EventWiza
                 <span>Generating Tailored Plan with AI...</span>
               </span>
             ) : (
-              'Generate Event Plan & Open Assistant'
+              <>
+                <span>Generate Event Plan & Open Assistant</span>
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </>
             )}
           </button>
         </div>
