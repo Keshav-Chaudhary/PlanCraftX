@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { EventTypeEnum } from '@/lib/schemas/event-plan';
+import { intakeResponseSchema } from '@/lib/schemas/api-schemas';
 
 interface WizardAiIntakeProps {
   readonly onExtracted: (params: {
@@ -40,17 +41,12 @@ export function WizardAiIntake({ onExtracted }: WizardAiIntakeProps) {
         throw new Error(err.message || 'AI intake parsing unavailable.');
       }
 
-      const data = (await res.json()) as {
-        eventType: EventTypeEnum;
-        eventDate: string;
-        location: string;
-        guestCount: number;
-        totalBudgetMajor: number;
-        currency: string;
-        isOutdoor: boolean;
-        priorities?: string | undefined;
-        dietaryRequirements?: string | undefined;
-      };
+      const json = await res.json();
+      const parseResult = intakeResponseSchema.safeParse(json);
+      if (!parseResult.success) {
+        throw new Error('AI intake returned invalid data format.');
+      }
+      const data = parseResult.data;
 
       onExtracted({
         eventType: data.eventType,

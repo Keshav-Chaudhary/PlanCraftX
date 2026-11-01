@@ -2,24 +2,17 @@ import { NextResponse } from 'next/server';
 import { chatRequestSchema } from '@/lib/schemas/api-schemas';
 import { generateGeminiStream } from '@/lib/api-clients/gemini';
 import { buildChatSystemPrompt } from '@/lib/prompts/planning-prompts';
+import { validateJsonBody } from '@/lib/http/validated-json';
 
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+  const validation = await validateJsonBody(request, chatRequestSchema, {
+    maxSizeBytes: 256 * 1024,
+  });
+  if (!validation.success) {
+    return validation.response;
   }
 
-  const parsed = chatRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation Error', details: parsed.error.issues },
-      { status: 400 },
-    );
-  }
-
-  const { messages, eventContext } = parsed.data;
+  const { messages, eventContext } = validation.data;
   const systemPrompt = buildChatSystemPrompt(eventContext);
 
   const formattedHistory = messages

@@ -7,9 +7,6 @@
   ],
   "project": ["app/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}", "scripts/**/*.{js,mjs,ts}"],
   "ignoreDependencies": [
-    "clsx",
-    "lucide-react",
-    "tailwind-merge",
     "@testing-library/user-event",
     "eslint-config-next",
     "@next/eslint-plugin-next",

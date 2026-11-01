@@ -12,14 +12,12 @@ export interface SecureFetchOptions extends RequestInit {
   readonly expectedContentType?: string;
 }
 
-export class SsrffSecurityError extends Error {
+export class SsrfSecurityError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'SsrffSecurityError';
+    this.name = 'SsrfSecurityError';
   }
 }
-
-export { SsrffSecurityError as SsrfSecurityError };
 
 const DEFAULT_MAX_RESPONSE_SIZE = 2 * 1024 * 1024; // 2 MB
 const DEFAULT_TIMEOUT_MS = 8000; // 8 seconds
@@ -39,18 +37,18 @@ const PRIVATE_IP_PATTERNS = [
 
 function validateProtocolAndCredentials(parsed: URL, isProd: boolean): void {
   if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
-    throw new SsrffSecurityError(`Unsupported outbound protocol: ${parsed.protocol}`);
+    throw new SsrfSecurityError(`Unsupported outbound protocol: ${parsed.protocol}`);
   }
   if (isProd && parsed.protocol !== 'https:') {
-    throw new SsrffSecurityError(
+    throw new SsrfSecurityError(
       `Insecure HTTP protocol disallowed in production: ${parsed.protocol}`,
     );
   }
   if (parsed.username || parsed.password) {
-    throw new SsrffSecurityError('Credential-bearing URLs are strictly forbidden');
+    throw new SsrfSecurityError('Credential-bearing URLs are strictly forbidden');
   }
   if (isProd && parsed.port && parsed.port !== '443') {
-    throw new SsrffSecurityError(
+    throw new SsrfSecurityError(
       `Non-standard port ${parsed.port} is strictly disallowed in production`,
     );
   }
@@ -62,7 +60,7 @@ function validateTargetHost(hostname: string, isProd: boolean): void {
       if (!isProd && (hostname === 'localhost' || hostname === '127.0.0.1')) {
         break; // Allowed in local dev/test
       }
-      throw new SsrffSecurityError(
+      throw new SsrfSecurityError(
         `Outbound request to private/internal host ${hostname} is blocked`,
       );
     }
@@ -71,7 +69,7 @@ function validateTargetHost(hostname: string, isProd: boolean): void {
   if (isProd || (!hostname.includes('localhost') && hostname !== '127.0.0.1')) {
     const isApproved = (ALLOWED_UPSTREAM_HOSTS as readonly string[]).includes(hostname);
     if (!isApproved) {
-      throw new SsrffSecurityError(
+      throw new SsrfSecurityError(
         `Destination hostname "${hostname}" is not in the approved upstream allowlist`,
       );
     }
@@ -83,14 +81,14 @@ function validateTargetHost(hostname: string, isProd: boolean): void {
  */
 export function validateOutboundUrl(targetUrl: string): URL {
   if (/[\u0000-\u001F\u007F]/.test(targetUrl)) {
-    throw new SsrffSecurityError('URL contains disallowed control characters');
+    throw new SsrfSecurityError('URL contains disallowed control characters');
   }
 
   let parsed: URL;
   try {
     parsed = new URL(targetUrl);
   } catch {
-    throw new SsrffSecurityError(`Malformed outbound URL: ${targetUrl}`);
+    throw new SsrfSecurityError(`Malformed outbound URL: ${targetUrl}`);
   }
 
   const isProd = process.env['NODE_ENV'] === 'production' || Boolean(process.env['VERCEL_ENV']);
@@ -104,7 +102,7 @@ function validateResponseContentType(response: Response, expectedType?: string):
   if (!expectedType || !response.headers?.get) return;
   const contentType = response.headers.get('content-type') || '';
   if (!contentType.toLowerCase().includes(expectedType.toLowerCase())) {
-    throw new SsrffSecurityError(
+    throw new SsrfSecurityError(
       `Unexpected upstream content-type "${contentType}". Expected: "${expectedType}"`,
     );
   }
@@ -114,7 +112,7 @@ function validateResponseSize(response: Response, maxBytes?: number): void {
   const contentLength = response.headers?.get?.('content-length');
   const limit = maxBytes ?? DEFAULT_MAX_RESPONSE_SIZE;
   if (contentLength && Number(contentLength) > limit) {
-    throw new SsrffSecurityError(
+    throw new SsrfSecurityError(
       `Upstream response length (${contentLength} bytes) exceeds maximum allowable limit of ${limit} bytes`,
     );
   }
@@ -135,7 +133,7 @@ function createBoundedStream(
         bytesRead += chunk.byteLength;
         if (bytesRead > maxBytes) {
           controller.error(
-            new SsrffSecurityError(
+            new SsrfSecurityError(
               `Upstream response body exceeded maximum allowable limit of ${maxBytes} bytes while streaming`,
             ),
           );

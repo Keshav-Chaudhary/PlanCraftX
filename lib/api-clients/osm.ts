@@ -1,15 +1,30 @@
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
 import { secureFetch } from '../security/secure-fetch';
+import type { OsmPlace } from '../schemas/api-schemas';
 
-export interface OsmPlace {
-  readonly osmId: string;
-  readonly name: string;
-  readonly displayName: string;
-  readonly type: string;
-  readonly category: string;
-  readonly latitude: number;
-  readonly longitude: number;
+export type { OsmPlace };
+
+function resolvePlaceName(place: Record<string, unknown>, fallbackQuery: string): string {
+  const rawName = place['name'];
+  if (typeof rawName === 'string' && rawName.trim().length > 0) {
+    return rawName.trim();
+  }
+  const displayName = typeof place['display_name'] === 'string' ? place['display_name'] : '';
+  const firstSegment = displayName.split(',')[0]?.trim();
+  return firstSegment || fallbackQuery;
+}
+
+function mapRawPlaceToOsmPlace(place: Record<string, unknown>, fallbackQuery: string): OsmPlace {
+  return {
+    osmId: String(place['osm_id']),
+    name: resolvePlaceName(place, fallbackQuery),
+    displayName: String(place['display_name']),
+    type: String(place['type'] || 'venue'),
+    category: String(place['class'] || 'place'),
+    latitude: parseFloat(String(place['lat'] || '0')),
+    longitude: parseFloat(String(place['lon'] || '0')),
+  };
 }
 
 /**
@@ -48,22 +63,7 @@ export async function searchOsmPlaces(
 
     const places: OsmPlace[] = data
       .filter((p) => typeof p['osm_id'] !== 'undefined' && typeof p['display_name'] === 'string')
-      .map((p) => {
-        const name =
-          typeof p['name'] === 'string' && p['name'].trim()
-            ? p['name']
-            : (p['display_name'] as string).split(',')[0]?.trim() || query;
-
-        return {
-          osmId: String(p['osm_id']),
-          name,
-          displayName: String(p['display_name']),
-          type: String(p['type'] || 'venue'),
-          category: String(p['class'] || 'place'),
-          latitude: parseFloat(String(p['lat'] || '0')),
-          longitude: parseFloat(String(p['lon'] || '0')),
-        };
-      });
+      .map((p) => mapRawPlaceToOsmPlace(p, query));
 
     return ok(places);
   } catch (error: unknown) {

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { EventPlan } from '@/lib/schemas/event-plan';
 import { generatePlanFindings, type PlanFinding } from '@/lib/domain/insights';
-import type { PlanReviewResponse } from '@/lib/schemas/api-schemas';
+import { planReviewResponseSchema, type PlanReviewResponse } from '@/lib/schemas/api-schemas';
 
 interface OverviewInsightsCardProps {
   readonly plan: EventPlan;
@@ -38,8 +38,12 @@ export function OverviewInsightsCard({ plan }: OverviewInsightsCardProps) {
         const errData = (await res.json().catch(() => ({}))) as { message?: string };
         throw new Error(errData.message || 'AI Plan Review service unavailable.');
       }
-      const data = (await res.json()) as PlanReviewResponse;
-      setAiReview(data);
+      const json = await res.json();
+      const parseResult = planReviewResponseSchema.safeParse(json);
+      if (!parseResult.success) {
+        throw new Error('AI Plan Review returned an invalid response format.');
+      }
+      setAiReview(parseResult.data);
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Review generation failed.');
     } finally {

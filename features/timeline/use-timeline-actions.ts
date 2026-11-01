@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { z } from 'zod';
 import type { EventPlan, TimelineItem } from '@/lib/schemas/event-plan';
 import { createPlanCalendarIcs } from '@/lib/domain/ics-generator';
-import { cycleMilestoneStatus, type PublicHoliday } from '@/lib/domain/timeline-engine';
+import { cycleMilestoneStatus } from '@/lib/domain/timeline-engine';
+import { publicHolidaySchema, type PublicHoliday } from '@/lib/schemas/api-schemas';
 
 export function useTimelineActions(
   plan: EventPlan,
@@ -22,8 +24,11 @@ export function useTimelineActions(
           body: JSON.stringify({ year, countryCode: 'US' }),
         });
         if (res.ok) {
-          const data = (await res.json()) as { holidays: PublicHoliday[] };
-          setHolidays(data.holidays || []);
+          const json = await res.json();
+          const parsed = z.object({ holidays: z.array(publicHolidaySchema) }).safeParse(json);
+          if (parsed.success) {
+            setHolidays(parsed.data.holidays);
+          }
         }
       } catch {
         // progressive enhancement

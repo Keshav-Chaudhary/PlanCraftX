@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { z } from 'zod';
 import type { EventPlan } from '@/lib/schemas/event-plan';
-import type { ChatMessage } from '@/lib/schemas/api-schemas';
-import type { WeatherData } from '@/lib/api-clients/open-meteo';
+import { type ChatMessage, type WeatherData, weatherDataSchema } from '@/lib/schemas/api-schemas';
 import { ThinkingTrace } from '../ui/thinking-trace';
 
 interface ChatAssistantProps {
@@ -77,9 +77,13 @@ export function ChatAssistant({ plan }: ChatAssistantProps) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ location: plan.location, date: plan.eventDate }),
     })
-      .then((res) => res.json())
-      .then((data: { weather?: WeatherData }) => {
-        if (data.weather) setWeather(data.weather);
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!json) return;
+        const parsed = z.object({ weather: weatherDataSchema }).safeParse(json);
+        if (parsed.success) {
+          setWeather(parsed.data.weather);
+        }
       })
       .catch(() => {})
       .finally(() => setWeatherLoading(false));

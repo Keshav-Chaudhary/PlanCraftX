@@ -9,15 +9,23 @@
  */
 
 import type { EventPlan, VendorItem, VendorStatusEnum } from '@/lib/schemas/event-plan';
+import {
+  EVENT_TYPES,
+  type EventType,
+  VENDOR_STATUSES,
+  type VendorStatus,
+  TIMELINE_STATUSES,
+  type TimelineStatus,
+} from '@/lib/schemas/event-plan';
 
-export const EVENT_TYPES = ['wedding', 'birthday', 'community'] as const;
-export type EventType = (typeof EVENT_TYPES)[number];
-
-export const VENDOR_STATUSES = ['to_contact', 'quoted', 'booked', 'paid'] as const;
-export type VendorStatus = (typeof VENDOR_STATUSES)[number];
-
-export const TIMELINE_STATUSES = ['pending', 'in_progress', 'completed'] as const;
-export type TimelineStatus = (typeof TIMELINE_STATUSES)[number];
+export {
+  EVENT_TYPES,
+  type EventType,
+  VENDOR_STATUSES,
+  type VendorStatus,
+  TIMELINE_STATUSES,
+  type TimelineStatus,
+};
 
 /**
  * Standard vendor and budget categories permitted per event type taxonomy.

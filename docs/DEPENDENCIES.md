@@ -13,17 +13,16 @@
 
 _Note: Audited with `npm audit --omit=dev` confirming **0 vulnerabilities**._
 
-| Package              | Version    | Purpose & Architecture Justification                                                                                                             |
-| :------------------- | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`next`**           | `16.4.2`   | Core full-stack framework providing App Router, React 19 Server Components, SSR, static prerendering, and optimized proxy middleware convention. |
-| **`react`**          | `^19.0.0`  | Modern React UI runtime supporting Server Actions, streaming suspense boundaries, and improved DOM reconciliation.                               |
-| **`react-dom`**      | `^19.0.0`  | DOM bindings for React 19.                                                                                                                       |
-| **`@google/genai`**  | `^2.30.0`  | Official Google GenAI SDK for server-side Gemini integration with structured JSON response schema and streaming.                                 |
-| **`zod`**            | `^3.24.2`  | Runtime validation for environment variables, API route inputs/outputs, AI structured schemas, and LocalStorage data schemas.                    |
-| **`@upstash/redis`** | `^1.34.3`  | Serverless REST-based Redis client for distributed rate limiting across Vercel multi-instance lambdas.                                           |
-| **`lucide-react`**   | `^0.475.0` | Accessible SVG icons with customizable ARIA attributes and zero runtime styling overhead.                                                        |
-| **`clsx`**           | `^2.1.1`   | Lightweight conditional class concatenation utility.                                                                                             |
-| **`tailwind-merge`** | `^2.6.0`   | Utility to merge conflicting Tailwind CSS class definitions safely.                                                                              |
+| Package              | Version   | Purpose & Architecture Justification                                                                                                             |
+| :------------------- | :-------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`next`**           | `16.4.2`  | Core full-stack framework providing App Router, React 19 Server Components, SSR, static prerendering, and optimized proxy middleware convention. |
+| **`react`**          | `^19.0.0` | Modern React UI runtime supporting Server Actions, streaming suspense boundaries, and improved DOM reconciliation.                               |
+| **`react-dom`**      | `^19.0.0` | DOM bindings for React 19.                                                                                                                       |
+| **`@google/genai`**  | `^2.30.0` | Official Google GenAI SDK for server-side Gemini integration with structured JSON response schema and streaming.                                 |
+| **`zod`**            | `^3.24.2` | Runtime validation for environment variables, API route inputs/outputs, AI structured schemas, and LocalStorage data schemas.                    |
+| **`@upstash/redis`** | `^1.34.3` | Serverless REST-based Redis client for distributed rate limiting across Vercel multi-instance lambdas.                                           |
+
+_Note on pruned packages: `clsx`, `lucide-react`, and `tailwind-merge` were audited and safely uninstalled during Code Quality Optimization Round 2 (CQ-04), eliminating dead package footprint and reducing bundle risk._
 
 ---
 

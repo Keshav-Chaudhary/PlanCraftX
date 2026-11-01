@@ -7,7 +7,10 @@ import {
   applyTradeoffOption,
   type TradeoffOption,
 } from '@/lib/domain/tradeoffs';
-import type { ExplainTradeoffsResponse } from '@/lib/schemas/api-schemas';
+import {
+  explainTradeoffsResponseSchema,
+  type ExplainTradeoffsResponse,
+} from '@/lib/schemas/api-schemas';
 
 interface BudgetTradeoffBannerProps {
   readonly plan: EventPlan;
@@ -47,8 +50,12 @@ export function BudgetTradeoffBanner({ plan, onPlanUpdate }: BudgetTradeoffBanne
         const errData = (await res.json().catch(() => ({}))) as { message?: string };
         throw new Error(errData.message || 'AI Tradeoff Explainer service unavailable.');
       }
-      const data = (await res.json()) as ExplainTradeoffsResponse;
-      setAiExplanation(data);
+      const json = await res.json();
+      const parseResult = explainTradeoffsResponseSchema.safeParse(json);
+      if (!parseResult.success) {
+        throw new Error('AI Tradeoff Explainer returned an invalid response format.');
+      }
+      setAiExplanation(parseResult.data);
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Failed to generate explanation.');
     } finally {

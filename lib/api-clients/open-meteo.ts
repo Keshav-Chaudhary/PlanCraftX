@@ -17,16 +17,47 @@ export interface GeocodingResult {
   readonly country: string;
 }
 
-function interpretWeatherCode(code: number): string {
-  if (code === 0) return 'Clear sky';
-  if (code <= 3) return 'Partly cloudy';
-  if (code <= 48) return 'Foggy';
-  if (code <= 55) return 'Drizzle';
-  if (code <= 65) return 'Rain';
-  if (code <= 75) return 'Snow';
-  if (code <= 82) return 'Rain showers';
-  if (code <= 99) return 'Thunderstorm';
-  return 'Overcast';
+interface WeatherCodeRange {
+  readonly maxCode: number;
+  readonly description: string;
+}
+
+const WEATHER_CODE_TABLE: readonly WeatherCodeRange[] = [
+  { maxCode: 0, description: 'Clear sky' },
+  { maxCode: 3, description: 'Partly cloudy' },
+  { maxCode: 48, description: 'Foggy' },
+  { maxCode: 55, description: 'Drizzle' },
+  { maxCode: 65, description: 'Rain' },
+  { maxCode: 75, description: 'Snow' },
+  { maxCode: 82, description: 'Rain showers' },
+  { maxCode: 99, description: 'Thunderstorm' },
+] as const;
+
+export function interpretWeatherCode(code: number): string {
+  if (!Number.isFinite(code) || code < 0) {
+    return 'Overcast';
+  }
+  const match = WEATHER_CODE_TABLE.find((entry) => code <= entry.maxCode);
+  return match ? match.description : 'Overcast';
+}
+
+function parseGeocodingResult(
+  first: Record<string, unknown> | undefined,
+  query: string,
+): Result<GeocodingResult, { code: string; message: string }> {
+  if (!first || typeof first['latitude'] !== 'number' || typeof first['longitude'] !== 'number') {
+    return err({
+      code: 'LOCATION_NOT_FOUND',
+      message: `No geographic coordinates found for "${query}".`,
+    });
+  }
+
+  return ok({
+    latitude: first['latitude'],
+    longitude: first['longitude'],
+    name: String(first['name'] || query),
+    country: String(first['country'] || ''),
+  });
 }
 
 /**
@@ -48,20 +79,7 @@ export async function searchCoordinates(
     }
 
     const data = (await res.json()) as { results?: Array<Record<string, unknown>> };
-    const first = data.results?.[0];
-    if (!first || typeof first['latitude'] !== 'number' || typeof first['longitude'] !== 'number') {
-      return err({
-        code: 'LOCATION_NOT_FOUND',
-        message: `No geographic coordinates found for "${query}".`,
-      });
-    }
-
-    return ok({
-      latitude: first['latitude'],
-      longitude: first['longitude'],
-      name: String(first['name'] || query),
-      country: String(first['country'] || ''),
-    });
+    return parseGeocodingResult(data.results?.[0], query);
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Network error';
     return err({

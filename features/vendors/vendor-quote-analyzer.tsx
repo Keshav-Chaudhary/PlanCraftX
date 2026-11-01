@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { EventPlan, VendorItem } from '@/lib/schemas/event-plan';
-import type { QuoteExtractResponse } from '@/lib/schemas/api-schemas';
+import { quoteExtractResponseSchema, type QuoteExtractResponse } from '@/lib/schemas/api-schemas';
 import { VendorQuoteForm } from './vendor-quote-form';
 
 interface VendorQuoteAnalyzerProps {
@@ -43,7 +43,13 @@ async function executeQuoteExtraction(
     throw new Error(err.message || 'Failed to extract vendor proposal.');
   }
 
-  return (await res.json()) as QuoteExtractResponse;
+  const json = await res.json();
+  const parsed = quoteExtractResponseSchema.safeParse(json);
+  if (!parsed.success) {
+    throw new Error('Vendor quote analyzer returned an invalid proposal structure.');
+  }
+
+  return parsed.data;
 }
 
 export function VendorQuoteAnalyzer({ plan, onSaveQuoteVendor }: VendorQuoteAnalyzerProps) {

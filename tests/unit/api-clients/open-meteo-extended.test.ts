@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { searchCoordinates, fetchWeatherForecast } from '../../../lib/api-clients/open-meteo';
+import {
+  searchCoordinates,
+  fetchWeatherForecast,
+  interpretWeatherCode,
+} from '../../../lib/api-clients/open-meteo';
 
 describe('Open-Meteo Extended Weather & Geocoding Suite', () => {
   beforeEach(() => {
@@ -106,6 +110,34 @@ describe('Open-Meteo Extended Weather & Geocoding Suite', () => {
       if (!res.success) {
         expect(res.error.code).toBe('NO_FORECAST_DATA');
       }
+    });
+  });
+
+  describe('Weather Code Interpretation Matrix & Boundaries', () => {
+    const testCases: readonly [number, string][] = [
+      [-1, 'Overcast'],
+      [0, 'Clear sky'],
+      [1, 'Partly cloudy'],
+      [3, 'Partly cloudy'],
+      [4, 'Foggy'],
+      [48, 'Foggy'],
+      [49, 'Drizzle'],
+      [55, 'Drizzle'],
+      [56, 'Rain'],
+      [65, 'Rain'],
+      [66, 'Snow'],
+      [75, 'Snow'],
+      [76, 'Rain showers'],
+      [82, 'Rain showers'],
+      [83, 'Thunderstorm'],
+      [99, 'Thunderstorm'],
+      [100, 'Overcast'],
+      [NaN, 'Overcast'],
+      [Infinity, 'Overcast'],
+    ];
+
+    it.each(testCases)('correctly interprets code %s as %s', (code, expected) => {
+      expect(interpretWeatherCode(code)).toBe(expected);
     });
   });
 });

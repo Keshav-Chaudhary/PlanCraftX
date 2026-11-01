@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   validateOutboundUrl,
   secureFetch,
-  SsrffSecurityError,
+  SsrfSecurityError,
 } from '../../lib/security/secure-fetch';
 
 describe('Security: SSRF Outbound Destination Defense', () => {
@@ -22,7 +22,7 @@ describe('Security: SSRF Outbound Destination Defense', () => {
   it('blocks unapproved external domains', () => {
     process.env.NODE_ENV = 'production';
     expect(() => validateOutboundUrl('https://evil-attacker.com/steal')).toThrowError(
-      SsrffSecurityError,
+      SsrfSecurityError,
     );
   });
 
@@ -30,41 +30,39 @@ describe('Security: SSRF Outbound Destination Defense', () => {
     process.env.NODE_ENV = 'production';
     expect(() =>
       validateOutboundUrl('https://generativelanguage.googleapis.com.attacker.com/api'),
-    ).toThrowError(SsrffSecurityError);
+    ).toThrowError(SsrfSecurityError);
   });
 
   it('blocks insecure HTTP in production', () => {
     process.env.NODE_ENV = 'production';
     expect(() => validateOutboundUrl('http://api.frankfurter.app/latest')).toThrowError(
-      SsrffSecurityError,
+      SsrfSecurityError,
     );
   });
 
   it('blocks private IPv4 spaces and loopback in production', () => {
     process.env.NODE_ENV = 'production';
-    expect(() => validateOutboundUrl('https://127.0.0.1/admin')).toThrowError(SsrffSecurityError);
-    expect(() => validateOutboundUrl('https://10.0.0.1/internal')).toThrowError(SsrffSecurityError);
-    expect(() => validateOutboundUrl('https://192.168.1.1/router')).toThrowError(
-      SsrffSecurityError,
-    );
+    expect(() => validateOutboundUrl('https://127.0.0.1/admin')).toThrowError(SsrfSecurityError);
+    expect(() => validateOutboundUrl('https://10.0.0.1/internal')).toThrowError(SsrfSecurityError);
+    expect(() => validateOutboundUrl('https://192.168.1.1/router')).toThrowError(SsrfSecurityError);
   });
 
   it('blocks cloud metadata endpoint (169.254.169.254)', () => {
     expect(() => validateOutboundUrl('http://169.254.169.254/computeMetadata/v1/')).toThrowError(
-      SsrffSecurityError,
+      SsrfSecurityError,
     );
   });
 
   it('blocks credential-bearing URLs', () => {
     expect(() => validateOutboundUrl('https://admin:secret@api.frankfurter.app/data')).toThrowError(
-      SsrffSecurityError,
+      SsrfSecurityError,
     );
   });
 
   it('blocks non-standard ports in production', () => {
     process.env.NODE_ENV = 'production';
     expect(() => validateOutboundUrl('https://api.frankfurter.app:8443/latest')).toThrowError(
-      SsrffSecurityError,
+      SsrfSecurityError,
     );
   });
 
@@ -92,7 +90,7 @@ describe('Security: SSRF Outbound Destination Defense', () => {
       secureFetch('https://api.frankfurter.app/latest', {
         expectedContentType: 'application/json',
       }),
-    ).rejects.toThrowError(SsrffSecurityError);
+    ).rejects.toThrowError(SsrfSecurityError);
   });
 
   it('rejects oversized responses when content-length exceeds maxBytes', async () => {
@@ -108,7 +106,7 @@ describe('Security: SSRF Outbound Destination Defense', () => {
       secureFetch('https://api.frankfurter.app/latest', {
         maxResponseSizeBytes: 100000,
       }),
-    ).rejects.toThrowError(SsrffSecurityError);
+    ).rejects.toThrowError(SsrfSecurityError);
   });
 
   it('terminates streaming responses in real-time when body byte count exceeds maxBytes', async () => {

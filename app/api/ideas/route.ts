@@ -2,24 +2,15 @@ import { NextResponse } from 'next/server';
 import { ideasRequestSchema } from '@/lib/schemas/api-schemas';
 import { generateGeminiStream } from '@/lib/api-clients/gemini';
 import { buildIdeasPrompt } from '@/lib/prompts/planning-prompts';
+import { validateJsonBody } from '@/lib/http/validated-json';
 
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+  const validation = await validateJsonBody(request, ideasRequestSchema);
+  if (!validation.success) {
+    return validation.response;
   }
 
-  const parsed = ideasRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation Error', details: parsed.error.issues },
-      { status: 400 },
-    );
-  }
-
-  const prompt = buildIdeasPrompt(parsed.data);
+  const prompt = buildIdeasPrompt(validation.data);
   const streamRes = await generateGeminiStream(prompt);
 
   if (!streamRes.success) {

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { OsmPlace } from '@/lib/api-clients/osm';
+import { z } from 'zod';
+import { osmPlaceSchema, type OsmPlace } from '@/lib/schemas/api-schemas';
 
 interface OsmVendorSearchProps {
   readonly location: string;
@@ -34,8 +35,13 @@ export function OsmVendorSearch({ location, onAddPlaceAsVendor }: OsmVendorSearc
         throw new Error('Places search service currently unavailable.');
       }
 
-      const data = (await res.json()) as { places: OsmPlace[] };
-      setOsmResults(data.places || []);
+      const json = await res.json();
+      const parsed = z.object({ places: z.array(osmPlaceSchema) }).safeParse(json);
+      if (parsed.success) {
+        setOsmResults(parsed.data.places);
+      } else {
+        setOsmResults([]);
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Search failed.';
       setOsmError(msg);

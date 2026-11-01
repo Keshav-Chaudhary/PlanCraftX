@@ -1,24 +1,15 @@
 import { NextResponse } from 'next/server';
 import { holidaysRequestSchema } from '@/lib/schemas/api-schemas';
 import { fetchPublicHolidays } from '@/lib/api-clients/nager-date';
+import { validateJsonBody } from '@/lib/http/validated-json';
 
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+  const validation = await validateJsonBody(request, holidaysRequestSchema);
+  if (!validation.success) {
+    return validation.response;
   }
 
-  const parsed = holidaysRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation Error', details: parsed.error.issues },
-      { status: 400 },
-    );
-  }
-
-  const { year, countryCode } = parsed.data;
+  const { year, countryCode } = validation.data;
   const holidaysRes = await fetchPublicHolidays(year, countryCode);
 
   if (!holidaysRes.success) {

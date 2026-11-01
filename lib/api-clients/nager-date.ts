@@ -1,6 +1,6 @@
 import { getEnv } from '../config/env';
 import { type Result, ok, err } from '../result/result';
-import type { PublicHoliday } from '../domain/timeline-engine';
+import type { PublicHoliday } from '../schemas/api-schemas';
 import { secureFetch } from '../security/secure-fetch';
 
 export async function fetchPublicHolidays(

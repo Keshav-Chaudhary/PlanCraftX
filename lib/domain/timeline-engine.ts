@@ -5,6 +5,9 @@
 
 import { type EventType, TIMELINE_PHASES, PHASE_IDEAL_LEAD_DAYS } from './event-rules';
 import type { EventPlan, TimelineStatusEnum } from '@/lib/schemas/event-plan';
+import type { PublicHoliday } from '@/lib/schemas/api-schemas';
+
+export type { PublicHoliday };
 
 export interface CalendarDateParts {
   readonly year: number;
@@ -145,11 +148,6 @@ export function calculateTimelinePhases(
       isCompressed,
     };
   });
-}
-
-export interface PublicHoliday {
-  readonly date: string;
-  readonly name: string;
 }
 
 export interface MilestoneClashCheck {

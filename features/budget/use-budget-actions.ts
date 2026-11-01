@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { z } from 'zod';
 import type { EventPlan, BudgetItem } from '@/lib/schemas/event-plan';
 import {
   minorToMajor,
@@ -63,7 +64,12 @@ export function useBudgetActions(plan: EventPlan, onPlanUpdate: (updatedPlan: Ev
 
       if (!res.ok) throw new Error('Conversion rate service unavailable.');
 
-      const { rate } = (await res.json()) as { rate: number };
+      const json = await res.json();
+      const parsed = z.object({ rate: z.number().positive() }).safeParse(json);
+      if (!parsed.success) {
+        throw new Error('Invalid conversion rate format received.');
+      }
+      const { rate } = parsed.data;
       const convertedTotal = convertCurrency(plan.totalBudgetMinor, plan.currency, newCurr, rate);
 
       const convertedItems = plan.budgetItems.map((it) => ({

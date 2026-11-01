@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { EVENT_TYPES_ENUM } from './event-plan';
+import { EVENT_TYPES } from './event-plan';
 
 export const planGenerationRequestSchema = z.object({
-  eventType: z.enum(EVENT_TYPES_ENUM),
+  eventType: z.enum(EVENT_TYPES),
   eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD'),
   location: z.string().min(1).max(150),
   guestCount: z.number().int().min(1).max(100000),
@@ -43,7 +43,7 @@ export const aiMilestoneProposalSchema = z.object({
 export type AIMilestoneProposal = z.infer<typeof aiMilestoneProposalSchema>;
 
 export const ideasRequestSchema = z.object({
-  eventType: z.enum(EVENT_TYPES_ENUM),
+  eventType: z.enum(EVENT_TYPES),
   guestCount: z.number().int().positive(),
   location: z.string().min(1),
   isOutdoor: z.boolean().default(false),
@@ -62,7 +62,7 @@ export type ChatMessage = z.infer<typeof chatMessageSchema>;
 export const chatRequestSchema = z.object({
   messages: z.array(chatMessageSchema).min(1).max(30),
   eventContext: z.object({
-    eventType: z.enum(EVENT_TYPES_ENUM),
+    eventType: z.enum(EVENT_TYPES),
     eventDate: z.string(),
     location: z.string(),
     guestCount: z.number(),
@@ -115,8 +115,8 @@ export const intakeRequestSchema = z.object({
 export type IntakeRequest = z.infer<typeof intakeRequestSchema>;
 
 export const intakeResponseSchema = z.object({
-  eventType: z.enum(EVENT_TYPES_ENUM),
-  title: z.string().min(1).max(100),
+  eventType: z.enum(EVENT_TYPES),
+  title: z.string().min(1).max(100).optional(),
   guestCount: z.number().int().positive().max(100000),
   totalBudgetMajor: z.number().positive().max(100000000),
   currency: z
@@ -199,3 +199,29 @@ export const planReviewResponseSchema = z.object({
   actionSteps: z.array(z.string().min(1)).min(1).max(5),
 });
 export type PlanReviewResponse = z.infer<typeof planReviewResponseSchema>;
+
+export const publicHolidaySchema = z.object({
+  date: z.string(),
+  name: z.string(),
+});
+export type PublicHoliday = z.infer<typeof publicHolidaySchema>;
+
+export const osmPlaceSchema = z.object({
+  osmId: z.string(),
+  name: z.string(),
+  displayName: z.string(),
+  type: z.string(),
+  category: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+});
+export type OsmPlace = z.infer<typeof osmPlaceSchema>;
+
+export const weatherDataSchema = z.object({
+  maxTempC: z.number(),
+  minTempC: z.number(),
+  precipitationProbability: z.number(),
+  weatherCode: z.number(),
+  conditionSummary: z.string(),
+});
+export type WeatherData = z.infer<typeof weatherDataSchema>;

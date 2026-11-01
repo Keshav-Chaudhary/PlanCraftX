@@ -50,7 +50,7 @@ In Security Hardening Round 2, we performed comprehensive adversarial testing an
 #### 2.5 P1: Streaming Body Byte Counting in `secureFetch`
 
 - **Vulnerability**: Checking only the `Content-Length` header allowed malicious upstreams using chunked transfer encoding to stream unbounded payloads, potentially exhausting server memory.
-- **Remediation**: Added `createBoundedStream()` utilizing a `TransformStream` that tracks byte consumption in real-time during chunk streaming, immediately terminating the stream with `SsrffSecurityError` if bytes exceed the configured limit (2 MB default).
+- **Remediation**: Added `createBoundedStream()` utilizing a `TransformStream` that tracks byte consumption in real-time during chunk streaming, immediately terminating the stream with `SsrfSecurityError` if bytes exceed the configured limit (2 MB default).
 
 #### 2.6 P1: Prototype Pollution Sanitization Call-Stack Guard
 

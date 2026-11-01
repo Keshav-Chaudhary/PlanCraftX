@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { EventPlan, VendorItem, VendorStatusEnum } from '@/lib/schemas/event-plan';
-import type { OsmPlace } from '@/lib/api-clients/osm';
+import type { OsmPlace } from '@/lib/schemas/api-schemas';
 import { updateVendorStatus, addVendorToPlan, buildOsmVendor } from '@/lib/domain/event-rules';
 
 export function useVendorActions(plan: EventPlan, onPlanUpdate: (updatedPlan: EventPlan) => void) {

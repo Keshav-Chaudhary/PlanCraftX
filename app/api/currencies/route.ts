@@ -1,24 +1,15 @@
 import { NextResponse } from 'next/server';
 import { currencyRatesRequestSchema } from '@/lib/schemas/api-schemas';
 import { fetchExchangeRate } from '@/lib/api-clients/frankfurter';
+import { validateJsonBody } from '@/lib/http/validated-json';
 
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+  const validation = await validateJsonBody(request, currencyRatesRequestSchema);
+  if (!validation.success) {
+    return validation.response;
   }
 
-  const parsed = currencyRatesRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation Error', details: parsed.error.issues },
-      { status: 400 },
-    );
-  }
-
-  const { from, to } = parsed.data;
+  const { from, to } = validation.data;
   const rateRes = await fetchExchangeRate(from, to);
 
   if (!rateRes.success) {

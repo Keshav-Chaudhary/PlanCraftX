@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { searchCoordinates, fetchWeatherForecast } from '@/lib/api-clients/open-meteo';
+import { validateJsonBody } from '@/lib/http/validated-json';
 
 const weatherQuerySchema = z.object({
   location: z.string().min(1).max(100),
@@ -8,22 +9,12 @@ const weatherQuerySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+  const validation = await validateJsonBody(request, weatherQuerySchema);
+  if (!validation.success) {
+    return validation.response;
   }
 
-  const parsed = weatherQuerySchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation Error', details: parsed.error.issues },
-      { status: 400 },
-    );
-  }
-
-  const { location, date } = parsed.data;
+  const { location, date } = validation.data;
   const geoRes = await searchCoordinates(location);
 
   if (!geoRes.success) {

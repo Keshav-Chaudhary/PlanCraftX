@@ -1,7 +1,7 @@
 import { describe, it, expect, afterAll, beforeAll } from 'vitest';
 import * as http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { secureFetch, SsrffSecurityError } from '../../lib/security/secure-fetch';
+import { secureFetch, SsrfSecurityError } from '../../lib/security/secure-fetch';
 
 describe('Security: secureFetch Live HTTP Server Streaming & Timeout Defense', () => {
   let server: http.Server;
@@ -120,7 +120,7 @@ describe('Security: secureFetch Live HTTP Server Streaming & Timeout Defense', (
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
     try {
-      await expect(secureFetch(`${serverUrl}/normal`)).rejects.toThrow(SsrffSecurityError);
+      await expect(secureFetch(`${serverUrl}/normal`)).rejects.toThrow(SsrfSecurityError);
     } finally {
       process.env.NODE_ENV = originalEnv;
     }

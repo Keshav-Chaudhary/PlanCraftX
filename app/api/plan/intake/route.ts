@@ -2,24 +2,15 @@ import { NextResponse } from 'next/server';
 import { intakeRequestSchema, intakeResponseSchema } from '@/lib/schemas/api-schemas';
 import { generateGeminiStructured } from '@/lib/api-clients/gemini';
 import { buildIntakePrompt } from '@/lib/prompts/planning-prompts';
+import { validateJsonBody } from '@/lib/http/validated-json';
 
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+  const validation = await validateJsonBody(request, intakeRequestSchema);
+  if (!validation.success) {
+    return validation.response;
   }
 
-  const parsed = intakeRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation Error', details: parsed.error.issues },
-      { status: 400 },
-    );
-  }
-
-  const prompt = buildIntakePrompt(parsed.data.description);
+  const prompt = buildIntakePrompt(validation.data.description);
   const aiRes = await generateGeminiStructured(prompt, intakeResponseSchema);
 
   if (!aiRes.success) {

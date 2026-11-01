@@ -1,24 +1,15 @@
 import { NextResponse } from 'next/server';
 import { placesRequestSchema } from '@/lib/schemas/api-schemas';
 import { searchOsmPlaces } from '@/lib/api-clients/osm';
+import { validateJsonBody } from '@/lib/http/validated-json';
 
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 });
+  const validation = await validateJsonBody(request, placesRequestSchema);
+  if (!validation.success) {
+    return validation.response;
   }
 
-  const parsed = placesRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Validation Error', details: parsed.error.issues },
-      { status: 400 },
-    );
-  }
-
-  const { query, location, limit } = parsed.data;
+  const { query, location, limit } = validation.data;
   const placesRes = await searchOsmPlaces(query, location, limit);
 
   if (!placesRes.success) {

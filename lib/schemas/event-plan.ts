@@ -1,13 +1,16 @@
 import { z } from 'zod';
 
-export const EVENT_TYPES_ENUM = ['wedding', 'birthday', 'community'] as const;
-export type EventTypeEnum = (typeof EVENT_TYPES_ENUM)[number];
+export const EVENT_TYPES = ['wedding', 'birthday', 'community'] as const;
+export type EventType = (typeof EVENT_TYPES)[number];
+export type EventTypeEnum = EventType;
 
-export const VENDOR_STATUSES_ENUM = ['to_contact', 'quoted', 'booked', 'paid'] as const;
-export type VendorStatusEnum = (typeof VENDOR_STATUSES_ENUM)[number];
+export const VENDOR_STATUSES = ['to_contact', 'quoted', 'booked', 'paid'] as const;
+export type VendorStatus = (typeof VENDOR_STATUSES)[number];
+export type VendorStatusEnum = VendorStatus;
 
-export const TIMELINE_STATUSES_ENUM = ['pending', 'in_progress', 'completed'] as const;
-export type TimelineStatusEnum = (typeof TIMELINE_STATUSES_ENUM)[number];
+export const TIMELINE_STATUSES = ['pending', 'in_progress', 'completed'] as const;
+export type TimelineStatus = (typeof TIMELINE_STATUSES)[number];
+export type TimelineStatusEnum = TimelineStatus;
 
 export const IDEA_CATEGORIES_ENUM = [
   'theme',
@@ -33,7 +36,7 @@ export const timelineItemSchema = z.object({
   phase: z.string().min(1),
   title: z.string().min(1),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD'),
-  status: z.enum(TIMELINE_STATUSES_ENUM).default('pending'),
+  status: z.enum(TIMELINE_STATUSES).default('pending'),
   description: z.string().optional(),
   isEstimate: z.boolean().default(true),
 });
@@ -43,7 +46,7 @@ export const vendorItemSchema = z.object({
   id: z.string().min(1),
   category: z.string().min(1),
   name: z.string().min(1),
-  status: z.enum(VENDOR_STATUSES_ENUM).default('to_contact'),
+  status: z.enum(VENDOR_STATUSES).default('to_contact'),
   estimatedCostMinor: z.number().int().nonnegative().optional(),
   contactInfo: z.string().optional(),
   notes: z.string().optional(),
@@ -66,7 +69,7 @@ export const eventPlanSchema = z.object({
   id: z.string().min(1),
   schemaVersion: z.number().int().positive().default(1),
   title: z.string().min(1).max(100),
-  eventType: z.enum(EVENT_TYPES_ENUM),
+  eventType: z.enum(EVENT_TYPES),
   eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD'),
   location: z.string().min(1).max(150),
   guestCount: z.number().int().positive(),

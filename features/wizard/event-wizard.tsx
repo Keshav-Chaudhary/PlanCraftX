@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { EventPlan, EventTypeEnum } from '@/lib/schemas/event-plan';
+import { eventPlanSchema } from '@/lib/schemas/event-plan';
 import { buildEventPlan, type PlanGenerationInput } from '@/lib/domain/plan-generator';
 import { EventTypePicker } from './event-type-picker';
 import { WizardScaleFields } from './wizard-scale-fields';
@@ -29,7 +30,12 @@ async function fetchOrFallbackPlan(payload: PlanGenerationInput): Promise<EventP
   }
 
   if (res.ok) {
-    return (await res.json()) as EventPlan;
+    const json = await res.json();
+    const parsed = eventPlanSchema.safeParse(json);
+    if (parsed.success) {
+      return parsed.data;
+    }
+    return buildEventPlan(payload);
   }
   if (res.status === 404) {
     return buildEventPlan(payload);
