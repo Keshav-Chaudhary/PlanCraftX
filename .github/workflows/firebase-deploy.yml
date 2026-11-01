@@ -28,7 +28,7 @@ jobs:
       - name: Run Verification Checks
         run: npm run verify
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'test-gemini-mock-key' }}
 
       - name: Build Next.js Application
         run: npm run build

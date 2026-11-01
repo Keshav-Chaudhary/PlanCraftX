@@ -104,8 +104,10 @@ test.describe('End-to-End Core Planning Journey', () => {
     await expect(page.locator('button:has-text("⏳ In Progress")').first()).toBeVisible();
 
     // Test RFC 5545 .ics calendar export download
+    const icsBtn = page.locator('#export-ics-btn');
+    await icsBtn.scrollIntoViewIfNeeded();
     const icsPromise = page.waitForEvent('download');
-    await page.click('#export-ics-btn');
+    await icsBtn.click({ force: true });
     const icsDownload = await icsPromise;
     expect(icsDownload.suggestedFilename()).toContain('.ics');
 

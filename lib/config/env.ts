@@ -47,7 +47,11 @@ export const envSchema = z
     VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
 
     // Google Gemini AI Configuration (server-side only)
-    GEMINI_API_KEY: z.string().min(1, 'GEMINI_API_KEY must be provided').optional(),
+    GEMINI_API_KEY: z
+      .string()
+      .trim()
+      .optional()
+      .transform((val) => (val && val.length > 0 ? val : undefined)),
     GEMINI_MODEL: z.string().min(1).default('gemini-2.5-flash'),
 
     // Upstash Redis Distributed Rate Limiting (optional)
@@ -84,6 +88,14 @@ export type Env = z.infer<typeof envSchema>;
 
 let cachedEnv: Env | null = null;
 
+function cleanEnvValue(val?: string): string | undefined {
+  if (typeof val !== 'string') {
+    return undefined;
+  }
+  const trimmed = val.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
 /**
  * Validates and retrieves current environment variables.
  * Fails fast with clear descriptive error messages if invariants are violated.
@@ -96,17 +108,17 @@ export function getEnv(overrideProcessEnv?: Record<string, string | undefined>):
   const raw = overrideProcessEnv ?? {
     NODE_ENV: process.env['NODE_ENV'],
     VERCEL_ENV: process.env['VERCEL_ENV'] as Env['VERCEL_ENV'],
-    GEMINI_API_KEY: process.env['GEMINI_API_KEY'],
-    GEMINI_MODEL: process.env['GEMINI_MODEL'],
-    UPSTASH_REDIS_REST_URL: process.env['UPSTASH_REDIS_REST_URL'],
-    UPSTASH_REDIS_REST_TOKEN: process.env['UPSTASH_REDIS_REST_TOKEN'],
-    FRANKFURTER_BASE_URL: process.env['FRANKFURTER_BASE_URL'],
-    OPEN_METEO_FORECAST_BASE_URL: process.env['OPEN_METEO_FORECAST_BASE_URL'],
-    OPEN_METEO_GEOCODING_BASE_URL: process.env['OPEN_METEO_GEOCODING_BASE_URL'],
-    NAGER_DATE_BASE_URL: process.env['NAGER_DATE_BASE_URL'],
-    NOMINATIM_BASE_URL: process.env['NOMINATIM_BASE_URL'],
-    OVERPASS_BASE_URL: process.env['OVERPASS_BASE_URL'],
-    E2E_UPSTREAM_BASE_URL: process.env['E2E_UPSTREAM_BASE_URL'],
+    GEMINI_API_KEY: cleanEnvValue(process.env['GEMINI_API_KEY']),
+    GEMINI_MODEL: cleanEnvValue(process.env['GEMINI_MODEL']),
+    UPSTASH_REDIS_REST_URL: cleanEnvValue(process.env['UPSTASH_REDIS_REST_URL']),
+    UPSTASH_REDIS_REST_TOKEN: cleanEnvValue(process.env['UPSTASH_REDIS_REST_TOKEN']),
+    FRANKFURTER_BASE_URL: cleanEnvValue(process.env['FRANKFURTER_BASE_URL']),
+    OPEN_METEO_FORECAST_BASE_URL: cleanEnvValue(process.env['OPEN_METEO_FORECAST_BASE_URL']),
+    OPEN_METEO_GEOCODING_BASE_URL: cleanEnvValue(process.env['OPEN_METEO_GEOCODING_BASE_URL']),
+    NAGER_DATE_BASE_URL: cleanEnvValue(process.env['NAGER_DATE_BASE_URL']),
+    NOMINATIM_BASE_URL: cleanEnvValue(process.env['NOMINATIM_BASE_URL']),
+    OVERPASS_BASE_URL: cleanEnvValue(process.env['OVERPASS_BASE_URL']),
+    E2E_UPSTREAM_BASE_URL: cleanEnvValue(process.env['E2E_UPSTREAM_BASE_URL']),
   };
 
   const parsed = envSchema.safeParse(raw);

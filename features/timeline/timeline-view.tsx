@@ -28,7 +28,7 @@ export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="relative z-10 flex flex-wrap items-center gap-3">
           <div className="flex items-center space-x-2 text-xs">
             <label htmlFor="timeline-status-filter" className="text-foreground font-medium">
               Filter:
@@ -50,7 +50,7 @@ export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
             type="button"
             onClick={handleExportIcs}
             id="export-ics-btn"
-            className="bg-primary text-primary-fg inline-flex cursor-pointer items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-opacity hover:opacity-90"
+            className="bg-primary text-primary-fg relative z-10 inline-flex cursor-pointer items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-opacity hover:opacity-90"
           >
             📅 Export RFC 5545 Calendar (.ics)
           </button>
