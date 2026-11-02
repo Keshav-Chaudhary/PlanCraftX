@@ -37,14 +37,22 @@ export function ScrollReveal({
           observer.disconnect();
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+      { threshold: 0.01, rootMargin: '120px 0px 120px 0px' },
     );
 
     if (ref.current) {
       observer.observe(ref.current);
     }
 
-    return () => observer.disconnect();
+    // Safety fallback: ensure content becomes fully visible after short delay
+    const fallbackTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, 400);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   return (

@@ -23,7 +23,7 @@ function ThemeToggleSwitch({ theme, mounted, className, onToggle }: SwitchProps)
   if (!mounted) {
     return (
       <div
-        className={`bg-surface-3 relative flex h-8 w-16 items-center rounded-full border border-[var(--border-strong)] p-0.5 opacity-80 ${className}`}
+        className={`bg-surface-2 relative flex h-8 w-16 items-center rounded-full border border-[var(--border-strong)] p-0.5 opacity-80 ${className}`}
       >
         <div className="text-fg-muted relative z-10 flex w-1/2 justify-center">
           <Moon className="size-3.5" />
@@ -41,14 +41,14 @@ function ThemeToggleSwitch({ theme, mounted, className, onToggle }: SwitchProps)
       onClick={onToggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
       title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
-      className={`bg-surface-3 relative flex h-8 w-16 cursor-pointer items-center rounded-full border border-[var(--border-strong)] p-0.5 shadow-inner transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] ${className}`}
+      className={`bg-surface-2 relative flex h-8 w-16 cursor-pointer items-center rounded-full border border-[var(--border-strong)] p-0.5 shadow-inner transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] ${className}`}
     >
       <span
         aria-hidden="true"
         className={`absolute top-0.5 h-7 w-7 rounded-full transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
           isDark
             ? 'left-0.5 border border-[var(--accent-line)] bg-[var(--accent-subtle)] shadow-none'
-            : 'left-[33px] border border-transparent bg-[var(--surface,#fff)] shadow-sm'
+            : 'left-[33px] border border-black/10 bg-white shadow-sm'
         }`}
       />
       <span
@@ -62,7 +62,7 @@ function ThemeToggleSwitch({ theme, mounted, className, onToggle }: SwitchProps)
       <span
         aria-hidden="true"
         className={`relative z-10 flex w-1/2 items-center justify-center transition-all duration-300 ${
-          !isDark ? 'text-fg' : 'text-fg-subtle'
+          !isDark ? 'text-stone-900' : 'text-fg-subtle'
         }`}
       >
         <Sun className="size-3.5" />

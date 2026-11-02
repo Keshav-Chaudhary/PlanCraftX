@@ -179,8 +179,8 @@ export default function HowItWorksPage() {
                 Strict Zero Synthetic Data Policy
               </h4>
               <p className="text-fg-muted text-xs leading-relaxed">
-                No hallucinated quotes, imaginary prices, or fake dates. All vendor proposals
-                require explicit user input or verifiable documentation.
+                No hallucinated quotes, imaginary prices, or synthetic unverified dates. All vendor
+                proposals require explicit user input or verifiable documentation.
               </p>
             </div>
           </div>

@@ -34,12 +34,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script
-          id="theme-initializer"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('PlanCraftX_theme');if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`,
-          }}
-        />
+        <script id="theme-initializer">{`(function(){try{var t=localStorage.getItem('PlanCraftX_theme');if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`}</script>
       </head>
       <body className="bg-bg text-fg flex min-h-screen flex-col font-sans antialiased">
         <a href="#main-content" className="skip-link">
