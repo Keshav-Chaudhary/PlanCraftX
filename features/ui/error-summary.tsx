@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 export interface FormErrorItem {
   readonly fieldId: string;
@@ -50,7 +51,7 @@ export function ErrorSummary({
         id="error-summary-heading"
         className="text-danger flex items-center gap-2 text-base font-semibold"
       >
-        <span aria-hidden="true">⚠️</span>
+        <AlertTriangle className="size-4 shrink-0" aria-hidden="true" />
         {title}
       </h2>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">

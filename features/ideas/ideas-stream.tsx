@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Sparkles, Lightbulb, Check, Accessibility } from 'lucide-react';
 import type { EventPlan, PersonalizedIdea } from '@/lib/schemas/event-plan';
 import { personalizedIdeaSchema } from '@/lib/schemas/event-plan';
 
@@ -151,7 +152,10 @@ export function IdeasStream({ plan, onPlanUpdate }: IdeasStreamProps) {
                 <span>Streaming Ideas...</span>
               </span>
             ) : (
-              '✨ Stream New Ideas with Gemini'
+              <span className="inline-flex items-center gap-1.5">
+                <Sparkles className="size-3.5" aria-hidden="true" />
+                <span>Stream New Ideas with Gemini</span>
+              </span>
             )}
           </button>
         </div>
@@ -178,10 +182,10 @@ export function IdeasStream({ plan, onPlanUpdate }: IdeasStreamProps) {
         {filteredIdeas.length === 0 ? (
           <div className="border-border bg-surface/50 col-span-2 rounded-2xl border border-dashed p-10 text-center">
             <div
-              className="bg-primary/10 mx-auto flex h-12 w-12 items-center justify-center rounded-2xl text-2xl"
+              className="bg-primary/10 text-primary mx-auto flex h-12 w-12 items-center justify-center rounded-2xl"
               aria-hidden="true"
             >
-              💡
+              <Lightbulb className="size-6" />
             </div>
             <h3 className="text-foreground mt-4 text-base font-bold">
               Personalized Creative Briefing
@@ -211,17 +215,24 @@ export function IdeasStream({ plan, onPlanUpdate }: IdeasStreamProps) {
                     {idea.dietaryTags.map((tag) => (
                       <span
                         key={tag}
-                        className="border-border/60 bg-surface-elevated text-foreground rounded-full border px-2 py-0.5 text-[10px] font-medium"
+                        className="border-border/60 bg-surface-elevated text-foreground inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium"
                       >
-                        ✓ {tag}
+                        <Check className="text-positive size-3 shrink-0" aria-hidden="true" />
+                        <span>{tag}</span>
                       </span>
                     ))}
                   </div>
                 )}
                 {idea.accessibilityNotes && (
-                  <p className="border-border/40 bg-surface-elevated text-muted mt-2 rounded-xl border p-2.5 text-[11px]">
-                    ♿ <strong className="text-foreground">Accessibility:</strong>{' '}
-                    {idea.accessibilityNotes}
+                  <p className="border-border/40 bg-surface-elevated text-muted mt-2 flex items-start gap-1.5 rounded-xl border p-2.5 text-[11px]">
+                    <Accessibility
+                      className="text-accent mt-0.5 size-3.5 shrink-0"
+                      aria-hidden="true"
+                    />
+                    <span>
+                      <strong className="text-foreground">Accessibility:</strong>{' '}
+                      {idea.accessibilityNotes}
+                    </span>
                   </p>
                 )}
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Clock } from 'lucide-react';
 import type { EventTypeEnum } from '@/lib/schemas/event-plan';
 import { generateEventDayRunsheet } from '@/lib/domain/runsheet';
 
@@ -16,7 +17,10 @@ export function RunsheetView({ eventType }: RunsheetViewProps) {
     <div className="border-border bg-surface rounded-xl border p-4 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h4 className="text-foreground text-sm font-bold">⏱️ Event Day Run-Sheet & Schedule</h4>
+          <h4 className="text-foreground flex items-center gap-2 text-sm font-bold">
+            <Clock className="text-accent size-4 shrink-0" aria-hidden="true" />
+            <span>Event Day Run-Sheet & Schedule</span>
+          </h4>
           <p className="text-muted text-xs">
             Suggested chronological run-of-show for event day operations and vendor coordination.
           </p>

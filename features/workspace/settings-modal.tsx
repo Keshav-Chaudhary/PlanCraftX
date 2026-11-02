@@ -1,7 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, User, Shield, Lock, Sliders, Sparkles, Save, CheckCircle2 } from 'lucide-react';
+import {
+  X,
+  User,
+  Shield,
+  Lock,
+  Sliders,
+  Sparkles,
+  Save,
+  CheckCircle2,
+  ShieldCheck,
+  Scale,
+} from 'lucide-react';
 import { Button } from '@/features/ui/button';
 import {
   AccountSettingsTab,
@@ -43,6 +54,17 @@ function useThemeSync(isOpen: boolean, setTheme: (theme: 'light' | 'dark') => vo
   }, [isOpen, setTheme]);
 }
 
+interface SettingsContentProps {
+  readonly activeSection: SettingsSection;
+  readonly accountForm: AccountFormState;
+  readonly privacyForm: PrivacyFormState;
+  readonly securityForm: SecurityFormState;
+  readonly theme: 'light' | 'dark';
+  readonly setAccountForm: (form: AccountFormState) => void;
+  readonly setPrivacyForm: (form: PrivacyFormState) => void;
+  readonly changeTheme: (theme: 'light' | 'dark') => void;
+}
+
 function SettingsContent({
   activeSection,
   accountForm,
@@ -52,26 +74,13 @@ function SettingsContent({
   setAccountForm,
   setPrivacyForm,
   changeTheme,
-}: {
-  readonly activeSection: SettingsSection;
-  readonly accountForm: AccountFormState;
-  readonly privacyForm: PrivacyFormState;
-  readonly securityForm: SecurityFormState;
-  readonly theme: 'light' | 'dark';
-  readonly setAccountForm: (form: AccountFormState) => void;
-  readonly setPrivacyForm: (form: PrivacyFormState) => void;
-  readonly changeTheme: (theme: 'light' | 'dark') => void;
-}) {
-  switch (activeSection) {
-    case 'account':
-      return <AccountSettingsTab form={accountForm} onChange={setAccountForm} />;
-    case 'privacy':
-      return <PrivacySettingsTab form={privacyForm} onChange={setPrivacyForm} />;
-    case 'security':
-      return <SecuritySettingsTab form={securityForm} />;
-    case 'appearance':
-      return <AppearanceSettingsTab theme={theme} onChangeTheme={changeTheme} />;
-  }
+}: SettingsContentProps) {
+  if (activeSection === 'account')
+    return <AccountSettingsTab form={accountForm} onChange={setAccountForm} />;
+  if (activeSection === 'privacy')
+    return <PrivacySettingsTab form={privacyForm} onChange={setPrivacyForm} />;
+  if (activeSection === 'security') return <SecuritySettingsTab form={securityForm} />;
+  return <AppearanceSettingsTab theme={theme} onChangeTheme={changeTheme} />;
 }
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
@@ -181,7 +190,10 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
           <div className="mt-auto hidden border-t border-[var(--border-faint)] px-3 pt-4 md:block">
             <div className="text-fg-subtle text-[10px]">PlanCraftX v2.4.0-prod</div>
-            <div className="text-positive mt-0.5 text-[10px] font-bold">🟢 Telemetry Encrypted</div>
+            <div className="text-positive mt-0.5 flex items-center gap-1.5 text-[10px] font-bold">
+              <ShieldCheck className="size-3" aria-hidden="true" />
+              <span>Telemetry Encrypted</span>
+            </div>
           </div>
         </div>
 
@@ -249,9 +261,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </div>
 
           <div className="bg-surface-3/40 flex items-start gap-2.5 border-t border-[var(--border-faint)] px-6 py-3">
-            <span aria-hidden="true" className="shrink-0 text-base">
-              ⚖️
-            </span>
+            <Scale className="text-accent mt-0.5 size-4 shrink-0" aria-hidden="true" />
             <div>
               <span className="text-fg block text-[10px] font-bold tracking-wider uppercase">
                 Legal Information Notice

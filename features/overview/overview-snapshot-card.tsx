@@ -1,7 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin, Users, Calendar, Sparkles, Edit3, TreePine } from 'lucide-react';
+import {
+  MapPin,
+  Users,
+  Calendar,
+  Sparkles,
+  Edit3,
+  TreePine,
+  UtensilsCrossed,
+  Accessibility,
+} from 'lucide-react';
 import type { EventPlan } from '@/lib/schemas/event-plan';
 
 function getCountdownText(eventDate: string): string {
@@ -72,13 +81,15 @@ export function OverviewSnapshotCard({ plan }: { readonly plan: EventPlan }) {
             </span>
           )}
           {plan.dietaryRequirements && (
-            <span className="bg-surface-3 text-fg inline-flex items-center gap-1 rounded-full border border-[var(--border)] px-3 py-1 font-semibold">
-              🥗 Dietary: {plan.dietaryRequirements}
+            <span className="bg-surface-3 text-fg inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-3 py-1 font-semibold">
+              <UtensilsCrossed className="text-accent size-3.5" aria-hidden="true" />
+              <span>Dietary: {plan.dietaryRequirements}</span>
             </span>
           )}
           {plan.accessibilityNeeds && (
-            <span className="bg-surface-3 text-fg inline-flex items-center gap-1 rounded-full border border-[var(--border)] px-3 py-1 font-semibold">
-              ♿ Accessibility: {plan.accessibilityNeeds}
+            <span className="bg-surface-3 text-fg inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-3 py-1 font-semibold">
+              <Accessibility className="text-accent size-3.5" aria-hidden="true" />
+              <span>Accessibility: {plan.accessibilityNeeds}</span>
             </span>
           )}
         </div>

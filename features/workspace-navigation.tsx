@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
-  CalendarDays,
+  Settings,
   DollarSign,
   Clock,
   ClipboardList,
@@ -28,19 +28,19 @@ export interface WorkspaceTab {
 }
 
 export const WORKSPACE_TABS: readonly WorkspaceTab[] = [
-  { id: 'overview', href: '/plan', label: 'Overview', icon: '📊' },
-  { id: 'event', href: '/plan/event', label: 'Event Setup', icon: '⚙️' },
-  { id: 'budget', href: '/plan/budget', label: 'Budget Planner', icon: '💰' },
-  { id: 'timeline', href: '/plan/timeline', label: 'Timeline', icon: '📅' },
-  { id: 'vendors', href: '/plan/vendors', label: 'Vendors', icon: '📋' },
-  { id: 'ideas', href: '/plan/ideas', label: 'AI Ideas', icon: '💡' },
-  { id: 'assistant', href: '/plan/assistant', label: 'AI Assistant', icon: '🤖' },
-  { id: 'export', href: '/plan/export', label: 'Export & Backup', icon: '💾' },
+  { id: 'overview', href: '/plan', label: 'Overview', icon: 'LayoutDashboard' },
+  { id: 'event', href: '/plan/event', label: 'Event Setup', icon: 'Settings' },
+  { id: 'budget', href: '/plan/budget', label: 'Budget Planner', icon: 'DollarSign' },
+  { id: 'timeline', href: '/plan/timeline', label: 'Timeline', icon: 'Clock' },
+  { id: 'vendors', href: '/plan/vendors', label: 'Vendors', icon: 'ClipboardList' },
+  { id: 'ideas', href: '/plan/ideas', label: 'AI Ideas', icon: 'Lightbulb' },
+  { id: 'assistant', href: '/plan/assistant', label: 'AI Assistant', icon: 'Bot' },
+  { id: 'export', href: '/plan/export', label: 'Export & Backup', icon: 'Download' },
 ] as const;
 
 const TAB_ICONS: Record<string, React.ElementType> = {
   overview: LayoutDashboard,
-  event: CalendarDays,
+  event: Settings,
   budget: DollarSign,
   timeline: Clock,
   vendors: ClipboardList,

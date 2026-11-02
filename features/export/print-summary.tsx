@@ -1,5 +1,6 @@
 'use client';
 
+import { Printer, Calendar, MapPin, Users, Coins } from 'lucide-react';
 import type { EventPlan } from '@/lib/schemas/event-plan';
 import { formatMinorUnits } from '@/lib/domain/budget-math';
 
@@ -21,7 +22,8 @@ export function PrintSummary({ plan }: PrintSummaryProps) {
       <div className="border-border/50 mb-4 flex flex-wrap items-center justify-between gap-3 border-b pb-3 print:hidden">
         <div>
           <h3 className="text-foreground flex items-center gap-2 text-base font-semibold">
-            <span>🖨️</span> Executive Printable Summary
+            <Printer className="text-accent size-4 shrink-0" aria-hidden="true" />
+            <span>Executive Printable Summary</span>
           </h3>
           <p className="text-muted text-xs">
             Clean 1-page summary for family members, coordinators, and vendors.
@@ -43,11 +45,23 @@ export function PrintSummary({ plan }: PrintSummaryProps) {
           </div>
           <h2 className="text-foreground mt-0.5 text-xl font-bold">{plan.title}</h2>
           <div className="text-muted mt-2 flex flex-wrap gap-4 text-xs">
-            <span>📅 {plan.eventDate}</span>
-            <span>📍 {plan.location}</span>
-            <span>👥 {plan.guestCount} Guests</span>
-            <span>
-              💰 {totalMajor} {plan.currency}
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="size-3.5 shrink-0" aria-hidden="true" />
+              <span>{plan.eventDate}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
+              <span>{plan.location}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Users className="size-3.5 shrink-0" aria-hidden="true" />
+              <span>{plan.guestCount} Guests</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Coins className="size-3.5 shrink-0" aria-hidden="true" />
+              <span>
+                {totalMajor} {plan.currency}
+              </span>
             </span>
           </div>
         </header>

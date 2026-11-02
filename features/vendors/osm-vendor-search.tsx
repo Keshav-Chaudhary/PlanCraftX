@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { z } from 'zod';
+import { Cake, Utensils, Flower2, Building2 } from 'lucide-react';
 import { osmPlaceSchema, type OsmPlace } from '@/lib/schemas/api-schemas';
 
 interface OsmVendorSearchProps {
@@ -64,30 +65,34 @@ export function OsmVendorSearch({ location, onAddPlaceAsVendor }: OsmVendorSearc
         <button
           type="button"
           onClick={() => handleSearchOsm('bakery')}
-          className="border-border bg-surface hover:bg-surface-elevated text-foreground rounded-lg border px-3 py-1 text-xs font-medium"
+          className="border-border bg-surface hover:bg-surface-elevated text-foreground inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs font-medium"
         >
-          🍰 Bakeries
+          <Cake className="text-accent size-3.5" aria-hidden="true" />
+          <span>Bakeries</span>
         </button>
         <button
           type="button"
           onClick={() => handleSearchOsm('caterer')}
-          className="border-border bg-surface hover:bg-surface-elevated text-foreground rounded-lg border px-3 py-1 text-xs font-medium"
+          className="border-border bg-surface hover:bg-surface-elevated text-foreground inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs font-medium"
         >
-          🍽️ Caterers
+          <Utensils className="text-accent size-3.5" aria-hidden="true" />
+          <span>Caterers</span>
         </button>
         <button
           type="button"
           onClick={() => handleSearchOsm('florist')}
-          className="border-border bg-surface hover:bg-surface-elevated text-foreground rounded-lg border px-3 py-1 text-xs font-medium"
+          className="border-border bg-surface hover:bg-surface-elevated text-foreground inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs font-medium"
         >
-          💐 Florists
+          <Flower2 className="text-accent size-3.5" aria-hidden="true" />
+          <span>Florists</span>
         </button>
         <button
           type="button"
           onClick={() => handleSearchOsm('community centre')}
-          className="border-border bg-surface hover:bg-surface-elevated text-foreground rounded-lg border px-3 py-1 text-xs font-medium"
+          className="border-border bg-surface hover:bg-surface-elevated text-foreground inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs font-medium"
         >
-          🏛️ Venues / Centers
+          <Building2 className="text-accent size-3.5" aria-hidden="true" />
+          <span>Venues / Centers</span>
         </button>
       </div>
 

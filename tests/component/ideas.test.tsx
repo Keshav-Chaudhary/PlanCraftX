@@ -60,7 +60,7 @@ describe('IdeasStream Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Custom Cupcake Tower')).toBeDefined();
-      expect(screen.getByText('✓ Nut-Free')).toBeDefined();
+      expect(screen.getByText('Nut-Free')).toBeDefined();
       expect(onPlanUpdate).toHaveBeenCalled();
     });
   });

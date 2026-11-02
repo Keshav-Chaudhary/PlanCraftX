@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Share2, Check, Download, Upload, Printer } from 'lucide-react';
 import type { EventPlan } from '@/lib/schemas/event-plan';
 import { exportPlanJson, importPlanJson } from '@/lib/domain/storage-migration';
 import { encodePlanToShareHash } from '@/lib/domain/share-link';
@@ -105,9 +106,14 @@ export function PlanPortability({ plan, onPlanImported, onResetPlan }: PlanPorta
               type="button"
               onClick={handleCopyShareLink}
               id="copy-share-link-btn"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 mt-4 rounded-lg px-4 py-2 text-xs font-semibold shadow-sm transition"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 mt-4 inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-xs font-semibold shadow-sm transition"
             >
-              {shareSuccess ? '✓ Copied to Clipboard!' : '🔗 Copy Share Link'}
+              {shareSuccess ? (
+                <Check className="size-3.5 shrink-0" aria-hidden="true" />
+              ) : (
+                <Share2 className="size-3.5 shrink-0" aria-hidden="true" />
+              )}
+              <span>{shareSuccess ? 'Copied to Clipboard!' : 'Copy Share Link'}</span>
             </button>
           </div>
 
@@ -123,9 +129,10 @@ export function PlanPortability({ plan, onPlanImported, onResetPlan }: PlanPorta
               type="button"
               onClick={handleExportJson}
               id="export-json-btn"
-              className="border-border bg-surface hover:bg-surface-elevated text-foreground mt-4 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors"
+              className="border-border bg-surface hover:bg-surface-elevated text-foreground mt-4 inline-flex items-center justify-center gap-1.5 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors"
             >
-              ⬇ Download Plan JSON
+              <Download className="size-3.5 shrink-0" aria-hidden="true" />
+              <span>Download Plan JSON</span>
             </button>
           </div>
 
@@ -141,9 +148,10 @@ export function PlanPortability({ plan, onPlanImported, onResetPlan }: PlanPorta
             </div>
             <label
               htmlFor="plan-file-upload"
-              className="border-border bg-surface hover:bg-surface-elevated text-foreground mt-4 inline-flex cursor-pointer items-center justify-center rounded-lg border px-4 py-2 text-xs font-semibold transition-colors"
+              className="border-border bg-surface hover:bg-surface-elevated text-foreground mt-4 inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors"
             >
-              <span>⬆ Upload JSON File</span>
+              <Upload className="size-3.5 shrink-0" aria-hidden="true" />
+              <span>Upload JSON File</span>
               <input
                 id="plan-file-upload"
                 type="file"
@@ -165,9 +173,10 @@ export function PlanPortability({ plan, onPlanImported, onResetPlan }: PlanPorta
             <button
               type="button"
               onClick={() => window.print()}
-              className="border-border bg-surface hover:bg-surface-elevated text-foreground mt-4 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors"
+              className="border-border bg-surface hover:bg-surface-elevated text-foreground mt-4 inline-flex items-center justify-center gap-1.5 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors"
             >
-              🖨 Print Plan Summary
+              <Printer className="size-3.5 shrink-0" aria-hidden="true" />
+              <span>Print Plan Summary</span>
             </button>
           </div>
         </div>
@@ -175,9 +184,10 @@ export function PlanPortability({ plan, onPlanImported, onResetPlan }: PlanPorta
         {importSuccess && (
           <div
             role="status"
-            className="border-primary/30 bg-primary/10 text-primary mt-4 rounded-lg border p-3 text-xs"
+            className="border-primary/30 bg-primary/10 text-primary mt-4 flex items-center gap-2 rounded-lg border p-3 text-xs"
           >
-            ✓ Plan imported and validated successfully!
+            <Check className="size-3.5 shrink-0" aria-hidden="true" />
+            <span>Plan imported and validated successfully!</span>
           </div>
         )}
 

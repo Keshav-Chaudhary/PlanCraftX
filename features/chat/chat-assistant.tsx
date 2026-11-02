@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { z } from 'zod';
+import { CloudSun, AlertTriangle, Bot } from 'lucide-react';
 import type { EventPlan } from '@/lib/schemas/event-plan';
 import { type ChatMessage, type WeatherData, weatherDataSchema } from '@/lib/schemas/api-schemas';
 import { ThinkingTrace } from '../ui/thinking-trace';
@@ -20,9 +21,12 @@ function OutdoorWeatherBanner({
   return (
     <div className="border-border bg-surface flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4 shadow-sm">
       <div className="flex items-center space-x-3">
-        <span className="text-2xl" aria-hidden="true">
-          ⛅
-        </span>
+        <div
+          className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg"
+          aria-hidden="true"
+        >
+          <CloudSun className="size-5" />
+        </div>
         <div>
           <h4 className="text-foreground text-sm font-bold">Outdoor Event Weather Forecast</h4>
           <p className="text-muted text-xs">
@@ -34,8 +38,9 @@ function OutdoorWeatherBanner({
         </div>
       </div>
       {weather && weather.precipitationProbability > 30 && (
-        <span className="bg-warning/10 text-warning rounded-full px-3 py-1 text-xs font-semibold">
-          ⚠️ Rain Contingency Recommended
+        <span className="bg-warning/10 text-warning inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold">
+          <AlertTriangle className="size-3.5" aria-hidden="true" />
+          <span>Rain Contingency Recommended</span>
         </span>
       )}
     </div>
@@ -81,9 +86,7 @@ export function ChatAssistant({ plan }: ChatAssistantProps) {
       .then((json) => {
         if (!json) return;
         const parsed = z.object({ weather: weatherDataSchema }).safeParse(json);
-        if (parsed.success) {
-          setWeather(parsed.data.weather);
-        }
+        if (parsed.success) setWeather(parsed.data.weather);
       })
       .catch(() => {})
       .finally(() => setWeatherLoading(false));
@@ -154,10 +157,10 @@ export function ChatAssistant({ plan }: ChatAssistantProps) {
           {messages.length === 0 && (
             <div className="py-6 text-center">
               <div
-                className="bg-primary/10 mx-auto flex h-10 w-10 items-center justify-center rounded-xl text-xl"
+                className="bg-primary/10 text-primary mx-auto flex h-10 w-10 items-center justify-center rounded-xl"
                 aria-hidden="true"
               >
-                🤖
+                <Bot className="size-5" />
               </div>
               <h3 className="text-foreground mt-3 text-sm font-bold">
                 Co-Planning Assistant Ready

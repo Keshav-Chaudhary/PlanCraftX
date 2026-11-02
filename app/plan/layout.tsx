@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { AlertTriangle } from 'lucide-react';
 import { PlanProvider, usePlan } from '@/features/plan-context';
 import { WorkspaceSidebar } from '@/features/workspace/workspace-sidebar';
 import { WorkspaceMobileHeader } from '@/features/workspace/workspace-mobile-header';
@@ -65,7 +66,10 @@ function WorkspaceShell({ children }: { readonly children: React.ReactNode }) {
               aria-live="polite"
               className="border-warning/30 bg-warning/10 text-warning flex items-center justify-between rounded-xl border p-4 text-xs font-medium"
             >
-              <span>⚠️ {storageError}</span>
+              <span className="flex items-center gap-2">
+                <AlertTriangle className="size-4 shrink-0" aria-hidden="true" />
+                <span>{storageError}</span>
+              </span>
               <button
                 type="button"
                 onClick={clearStorageError}

@@ -106,7 +106,7 @@ export function PlanReadinessBar({ plan }: PlanReadinessBarProps) {
       <div className="text-fg-muted mt-3.5 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
         <span className="flex items-center gap-1.5">
           <CheckCircle2 className="text-positive size-3.5" />
-          Budget Aligned: {plan.totalBudgetMinor > 0 ? '✓' : '—'}
+          Budget Aligned: {plan.totalBudgetMinor > 0 ? 'Verified' : 'Pending'}
         </span>
         <span className="flex items-center gap-1.5">
           <Calendar className="text-accent size-3.5" />

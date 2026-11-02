@@ -1,5 +1,6 @@
 'use client';
 
+import { Calendar, AlertTriangle, Check, Clock, Circle } from 'lucide-react';
 import type { EventPlan } from '@/lib/schemas/event-plan';
 import { checkHolidayClash } from '@/lib/domain/timeline-engine';
 import { RunsheetView } from './runsheet-view';
@@ -50,9 +51,10 @@ export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
             type="button"
             onClick={handleExportIcs}
             id="export-ics-btn"
-            className="bg-primary text-primary-fg relative z-10 inline-flex cursor-pointer items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-opacity hover:opacity-90"
+            className="bg-primary text-primary-fg relative z-10 inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-opacity hover:opacity-90"
           >
-            📅 Export RFC 5545 Calendar (.ics)
+            <Calendar className="size-3.5 shrink-0" aria-hidden="true" />
+            <span>Export RFC 5545 Calendar (.ics)</span>
           </button>
         </div>
       </div>
@@ -93,8 +95,9 @@ export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
                       </span>
                     )}
                     {clash.hasClash && (
-                      <span className="bg-danger/10 text-danger rounded-full px-2 py-0.5 text-xs font-medium">
-                        ⚠️ Holiday Clash: {clash.holidayName}
+                      <span className="bg-danger/10 text-danger inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium">
+                        <AlertTriangle className="size-3 shrink-0" aria-hidden="true" />
+                        <span>Holiday Clash: {clash.holidayName}</span>
                       </span>
                     )}
                   </div>
@@ -108,7 +111,7 @@ export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
                   <button
                     type="button"
                     onClick={() => toggleStatus(item)}
-                    className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                       item.status === 'completed'
                         ? 'bg-primary text-primary-fg'
                         : item.status === 'in_progress'
@@ -116,11 +119,22 @@ export function TimelineView({ plan, onPlanUpdate }: TimelineViewProps) {
                           : 'border-border bg-surface hover:bg-surface-elevated text-foreground border'
                     }`}
                   >
-                    {item.status === 'completed'
-                      ? '✓ Completed'
-                      : item.status === 'in_progress'
-                        ? '⏳ In Progress'
-                        : '○ Pending'}
+                    {item.status === 'completed' ? (
+                      <>
+                        <Check className="size-3.5 shrink-0" aria-hidden="true" />
+                        <span>Completed</span>
+                      </>
+                    ) : item.status === 'in_progress' ? (
+                      <>
+                        <Clock className="size-3.5 shrink-0" aria-hidden="true" />
+                        <span>In Progress</span>
+                      </>
+                    ) : (
+                      <>
+                        <Circle className="size-3 shrink-0 opacity-70" aria-hidden="true" />
+                        <span>Pending</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

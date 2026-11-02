@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { FileText } from 'lucide-react';
 import type { EventPlan, VendorItem } from '@/lib/schemas/event-plan';
 import { quoteExtractResponseSchema, type QuoteExtractResponse } from '@/lib/schemas/api-schemas';
 import { formatMinorUnits } from '@/lib/domain/budget-math';
@@ -94,8 +95,9 @@ export function VendorQuoteAnalyzer({ plan, onSaveQuoteVendor }: VendorQuoteAnal
     <div className="border-border bg-surface rounded-xl border p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="text-foreground text-base font-bold">
-            🧾 Paste Vendor Proposal / Quotation
+          <h3 className="text-foreground flex items-center gap-2 text-base font-bold">
+            <FileText className="text-accent size-4 shrink-0" aria-hidden="true" />
+            <span>Paste Vendor Proposal / Quotation</span>
           </h3>
           <p className="text-muted text-xs">
             Paste raw quotes from emails or messages. AI extracts price, deposit, missing clauses,

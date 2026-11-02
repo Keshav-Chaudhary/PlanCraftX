@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { FolderOpen, Upload } from 'lucide-react';
 import { usePlan } from '@/features/plan-context';
 import { PlanPortability } from '@/features/export/plan-portability';
 import { importPlanJson } from '@/lib/domain/storage-migration';
@@ -48,10 +49,10 @@ export default function ExportPage() {
       ) : (
         <div className="border-border bg-surface mx-auto max-w-xl rounded-xl border p-8 text-center shadow-sm">
           <div
-            className="bg-surface-elevated mx-auto flex h-14 w-14 items-center justify-center rounded-xl text-2xl"
+            className="bg-surface-elevated text-accent mx-auto flex h-14 w-14 items-center justify-center rounded-xl"
             aria-hidden="true"
           >
-            📂
+            <FolderOpen className="size-7" />
           </div>
           <h2 className="text-foreground mt-4 text-xl font-bold">Import Plan from JSON Backup</h2>
           <p className="text-muted mt-2 text-sm leading-relaxed">
@@ -62,9 +63,10 @@ export default function ExportPage() {
           <div className="mt-6">
             <label
               htmlFor="standalone-plan-upload"
-              className="bg-primary text-primary-fg inline-flex cursor-pointer items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
+              className="bg-primary text-primary-fg inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
             >
-              <span>⬆ Choose JSON File to Restore</span>
+              <Upload className="size-4" aria-hidden="true" />
+              <span>Choose JSON File to Restore</span>
               <input
                 id="standalone-plan-upload"
                 type="file"

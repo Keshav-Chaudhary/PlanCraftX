@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Scale, Check } from 'lucide-react';
 import type { VendorItem } from '@/lib/schemas/event-plan';
 import { formatMinorUnits } from '@/lib/domain/budget-math';
 
@@ -36,7 +37,8 @@ export function QuoteComparison({ vendors, currency, onAcceptQuote }: QuoteCompa
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-foreground flex items-center gap-2 text-base font-semibold">
-            <span>⚖️</span> Side-by-Side Quote Comparison ({quotedVendors.length})
+            <Scale className="text-accent size-4 shrink-0" aria-hidden="true" />
+            <span>Side-by-Side Quote Comparison ({quotedVendors.length})</span>
           </h3>
           <p className="text-muted text-xs">
             Compare vendor proposals, unit pricing, and terms side-by-side.
@@ -125,8 +127,9 @@ export function QuoteComparison({ vendors, currency, onAcceptQuote }: QuoteCompa
                         Accept This Quote
                       </button>
                     ) : (
-                      <div className="flex w-full items-center justify-center gap-1 py-1 text-xs font-semibold text-emerald-600">
-                        <span>✓</span> Proposal Accepted
+                      <div className="flex w-full items-center justify-center gap-1.5 py-1 text-xs font-semibold text-emerald-600">
+                        <Check className="size-3.5" aria-hidden="true" />
+                        <span>Proposal Accepted</span>
                       </div>
                     )}
                   </div>

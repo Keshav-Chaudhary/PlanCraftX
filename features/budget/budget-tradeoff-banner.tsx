@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AlertTriangle, Lightbulb, Check, X } from 'lucide-react';
 import type { EventPlan } from '@/lib/schemas/event-plan';
 import {
   generateOverBudgetTradeoffs,
@@ -78,8 +79,9 @@ export function BudgetTradeoffBanner({ plan, onPlanUpdate }: BudgetTradeoffBanne
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-danger flex items-center space-x-2 text-base font-bold">
+            <AlertTriangle className="size-5 shrink-0" aria-hidden="true" />
             <span>
-              ⚠️ Over Budget by {formatMinorUnits(overAmount, plan.currency)} {plan.currency}
+              Over Budget by {formatMinorUnits(overAmount, plan.currency)} {plan.currency}
             </span>
           </h3>
           <p className="text-muted text-xs">
@@ -92,9 +94,10 @@ export function BudgetTradeoffBanner({ plan, onPlanUpdate }: BudgetTradeoffBanne
           id="explain-tradeoffs-btn"
           disabled={loadingAi}
           onClick={handleExplainWithAi}
-          className="border-border bg-surface text-foreground hover:bg-surface-elevated rounded-lg border px-3 py-1.5 text-xs font-semibold shadow-sm disabled:opacity-50"
+          className="border-border bg-surface text-foreground hover:bg-surface-elevated inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold shadow-sm disabled:opacity-50"
         >
-          {loadingAi ? 'AI Explaining Tradeoffs...' : '💡 Explain Tradeoffs with AI'}
+          <Lightbulb className="size-3.5 shrink-0" aria-hidden="true" />
+          <span>{loadingAi ? 'AI Explaining Tradeoffs...' : 'Explain Tradeoffs with AI'}</span>
         </button>
       </div>
 
@@ -114,8 +117,14 @@ export function BudgetTradeoffBanner({ plan, onPlanUpdate }: BudgetTradeoffBanne
                 className="border-border bg-surface-elevated/50 rounded border p-2.5"
               >
                 <p className="font-semibold">{exp.plainTextExplanation}</p>
-                <p className="mt-1 text-emerald-600 dark:text-emerald-400">✓ {exp.pros}</p>
-                <p className="mt-0.5 text-rose-600 dark:text-rose-400">✗ {exp.cons}</p>
+                <p className="mt-1 flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <Check className="size-3 shrink-0" aria-hidden="true" />
+                  <span>{exp.pros}</span>
+                </p>
+                <p className="mt-0.5 flex items-center gap-1 text-rose-600 dark:text-rose-400">
+                  <X className="size-3 shrink-0" aria-hidden="true" />
+                  <span>{exp.cons}</span>
+                </p>
               </div>
             ))}
           </div>

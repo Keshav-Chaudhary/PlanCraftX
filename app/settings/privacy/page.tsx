@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { Lock, Globe, Trash2, Download, CheckCircle2 } from 'lucide-react';
 import { clearPlanFromStorage, loadPlanFromStorage } from '@/features/storage';
 import { exportPlanJson } from '@/lib/domain/storage-migration';
 import { PageHeader, Badge } from '@/features/ui';
@@ -46,9 +47,10 @@ export default function PrivacySettingsPage() {
         <div
           role="status"
           aria-live="polite"
-          className="rounded-xl border border-[var(--accent-line)] bg-[var(--accent-subtle)] p-4 text-sm font-semibold text-[var(--accent)]"
+          className="flex items-center gap-2 rounded-xl border border-[var(--accent-line)] bg-[var(--accent-subtle)] p-4 text-sm font-semibold text-[var(--accent)]"
         >
-          ✓ All local PlanCraftX data has been permanently cleared from this browser.
+          <CheckCircle2 className="size-4 shrink-0" aria-hidden="true" />
+          <span>All local PlanCraftX data has been permanently cleared from this browser.</span>
         </div>
       )}
 
@@ -58,9 +60,12 @@ export default function PrivacySettingsPage() {
         className="bg-surface-2 rounded-2xl border border-[var(--border)] p-6 shadow-sm sm:p-8"
       >
         <div className="flex items-center space-x-3">
-          <span className="text-2xl" aria-hidden="true">
-            🔒
-          </span>
+          <div
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-subtle)] text-[var(--accent)]"
+            aria-hidden="true"
+          >
+            <Lock className="size-4" />
+          </div>
           <h2 id="local-storage-heading" className="text-fg text-xl font-bold">
             What Stays in Your Browser
           </h2>
@@ -86,9 +91,12 @@ export default function PrivacySettingsPage() {
         className="bg-surface-2 rounded-2xl border border-[var(--border)] p-6 shadow-sm sm:p-8"
       >
         <div className="flex items-center space-x-3">
-          <span className="text-2xl" aria-hidden="true">
-            🌐
-          </span>
+          <div
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-subtle)] text-[var(--accent)]"
+            aria-hidden="true"
+          >
+            <Globe className="size-4" />
+          </div>
           <h2 id="external-apis-heading" className="text-fg text-xl font-bold">
             What Data Leaves Your Browser
           </h2>
@@ -131,9 +139,12 @@ export default function PrivacySettingsPage() {
         className="bg-surface-2 rounded-2xl border border-[var(--border)] p-6 shadow-sm sm:p-8"
       >
         <div className="flex items-center space-x-3">
-          <span className="text-2xl" aria-hidden="true">
-            🗑️
-          </span>
+          <div
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-subtle)] text-[var(--accent)]"
+            aria-hidden="true"
+          >
+            <Trash2 className="size-4" />
+          </div>
           <h2 id="controls-heading" className="text-fg text-xl font-bold">
             Data Control & Deletion
           </h2>
@@ -148,18 +159,20 @@ export default function PrivacySettingsPage() {
             type="button"
             onClick={handleExportBackup}
             id="privacy-export-backup-btn"
-            className="bg-surface-3 text-fg inline-flex cursor-pointer items-center rounded-xl border border-[var(--border-strong)] px-5 py-2.5 text-sm font-semibold shadow-xs transition-colors hover:border-[var(--accent-line)]"
+            className="bg-surface-3 text-fg inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[var(--border-strong)] px-5 py-2.5 text-sm font-semibold shadow-xs transition-colors hover:border-[var(--accent-line)]"
           >
-            💾 Export JSON Backup First
+            <Download className="size-4" aria-hidden="true" />
+            <span>Export JSON Backup First</span>
           </button>
 
           <button
             type="button"
             onClick={() => setShowConfirmModal(true)}
             id="privacy-delete-all-btn"
-            className="inline-flex cursor-pointer items-center rounded-xl border border-red-500/40 px-5 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/10"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-red-500/40 px-5 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/10"
           >
-            🗑️ Delete All My Data
+            <Trash2 className="size-4" aria-hidden="true" />
+            <span>Delete All My Data</span>
           </button>
 
           <Link

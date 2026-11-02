@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import type { QuoteExtractResponse } from '@/lib/schemas/api-schemas';
 
 interface VendorQuoteResultCardProps {
@@ -40,9 +41,10 @@ export function VendorQuoteResultCard({
             {result.flags.map((flag, idx) => (
               <span
                 key={idx}
-                className="rounded bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-600 dark:text-amber-400"
+                className="inline-flex items-center gap-1 rounded bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-600 dark:text-amber-400"
               >
-                ⚠️ {flag}
+                <AlertTriangle className="size-3 shrink-0" aria-hidden="true" />
+                <span>{flag}</span>
               </span>
             ))}
           </div>
