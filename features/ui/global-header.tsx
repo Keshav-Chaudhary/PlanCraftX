@@ -57,7 +57,9 @@ export function GlobalHeader() {
                   key={item.href}
                   href={item.href}
                   id={item.id}
-                  className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all sm:px-4 sm:py-2 sm:text-sm ${
+                  className={`rounded-full px-2.5 py-1 text-xs font-bold transition-all sm:px-4 sm:py-2 sm:text-sm ${
+                    item.href !== '/' ? 'hidden md:inline-flex' : ''
+                  } ${
                     isActive
                       ? 'bg-accent text-white shadow-sm'
                       : 'text-fg-muted hover:bg-surface-2 hover:text-fg'

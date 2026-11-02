@@ -330,6 +330,34 @@ body {
   animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+@keyframes float-calendar {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-7deg);
+  }
+}
+
+@keyframes float-photo {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(10deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(11deg);
+  }
+}
+
+.animate-float-calendar {
+  animation: float-calendar 5s ease-in-out infinite;
+}
+
+.animate-float-photo {
+  animation: float-photo 6s ease-in-out 0.8s infinite;
+}
+
 .stagger > * {
   animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

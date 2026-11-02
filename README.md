@@ -52,9 +52,9 @@ PlanCraftX underwent a massive architectural and design system evolution. Below 
 <summary><b>🔄 Click to Expand/Collapse V1 vs V2 Comparison Gallery</b></summary>
 <br>
 
-### 1. Landing Page & Asymmetric Command Deck
+### 1. Landing Page & Cinematic AI SaaS Hero
 
-_Left: v1 baseline header and generic window frame. Right: v2 executive command deck with inline AI quick-prompt command bar, quick intake chips, and multi-layered celebration blueprint cards._
+_Left: v1 baseline header and generic window frame. Right: v2 cinematic midnight AI SaaS hero featuring two-line gradient typography, 3D purple calendar visual, rotated gala banquet photography, glassmorphic dual-card executive command deck with Hamilton-Hare proportional allocation and Open-Meteo live telemetry, interactive demo walkthrough modal, and bottom social proof capsule._
 <table>
   <tr>
     <th width="50%" align="center"><b>Version 1 (Legacy Baseline)</b></th>

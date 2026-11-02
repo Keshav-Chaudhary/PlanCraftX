@@ -33,7 +33,8 @@ function isTestOrDocFile(filePath) {
     norm.endsWith('.test.tsx') ||
     norm.endsWith('.spec.ts') ||
     norm.endsWith('.md') ||
-    norm.includes('scripts/')
+    norm.includes('scripts/') ||
+    norm === 'firebase.json'
   );
 }
 
